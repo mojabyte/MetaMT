@@ -286,13 +286,13 @@ def main():
             )
             train_loss = 0.0
 
-            train_loader_iteration = iter(train_loader)
+            train_loader_iterations = [iter(train_loader) for train_loader in train_loaders]
             for miteration_item in range(args.meta_iteration):
 
                 # for miteration_item, batch in enumerate(train_loader):
                 queue = [
-                    {"batch": next(train_loader_iteration), "task": task}
-                    for task, train_loader in zip(list_of_tasks, train_loaders)
+                    {"batch": next(train_loader_iterations[i]), "task": task}
+                    for i, task in enumerate(list_of_tasks)
                 ]
 
                 # == Data preparation ===========

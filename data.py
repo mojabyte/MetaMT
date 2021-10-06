@@ -103,8 +103,6 @@ class CorpusSC(Dataset):
         self.doc_stride = 128
         self.max_query_length = 64
 
-        # PATH = 'saved/multi_cased_L-12_H-768_A-12/'
-        # self.tokenizer = BertTokenizer.from_pretrained(PATH, local_files_only=True)
         self.tokenizer = BertTokenizer.from_pretrained(
             "bert-base-multilingual-cased", do_lower_case=False
         )
@@ -233,7 +231,6 @@ class CorpusSC(Dataset):
         return self.data["input_ids"].shape[0]
 
     def __getitem__(self, id):
-
         return {
             "input_ids": self.data["input_ids"][id],
             "token_type_ids": self.data["token_type_ids"][id],

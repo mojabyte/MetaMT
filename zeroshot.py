@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 from model import BertMetaLearning
-from datapath import loc
+from datapath import get_loc
 
 from transformers import (
     AdamW,
@@ -42,6 +42,7 @@ parser.add_argument(
     default=100,
     help="Print after every log_interval batches",
 )
+parser.add_argument("--data_dir", type=str, default="data/", help="directory of data")
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
@@ -88,19 +89,19 @@ DEVICE = torch.device("cuda" if args.cuda else "cpu")
 def load_data(task_lang):
     [task, lang] = task_lang.split("_")
     if task == "qa":
-        test_corpus = CorpusQA(loc["test"][task_lang][0], loc["test"][task_lang][1])
+        test_corpus = CorpusQA(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.qa_batch_size
     elif task == "sc":
-        test_corpus = CorpusSC(loc["test"][task_lang][0], loc["test"][task_lang][1])
+        test_corpus = CorpusSC(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.sc_batch_size
     elif task == "tc":
-        test_corpus = CorpusTC(loc["test"][task_lang][0])
+        test_corpus = CorpusTC(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.tc_batch_size
     elif task == "po":
-        test_corpus = CorpusPO(loc["test"][task_lang][0])
+        test_corpus = CorpusPO(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.po_batch_size
     elif task == "pa":
-        test_corpus = CorpusPA(loc["test"][task_lang][0])
+        test_corpus = CorpusPA(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.pa_batch_size
 
     return test_corpus, batch_size

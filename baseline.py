@@ -2,15 +2,12 @@ import os, json, argparse, time, torch, logging, warnings
 
 import pickle5 as pickle
 
-# import pickle
-
 import numpy as np
-import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 from model import BertMetaLearning
-from datapath import loc, get_loc
+from datapath import get_loc
 
 from transformers import (
     AdamW,

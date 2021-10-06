@@ -286,11 +286,12 @@ def main():
             )
             train_loss = 0.0
 
+            train_loader_iteration = iter(train_loader)
             for miteration_item in range(args.meta_iteration):
 
                 # for miteration_item, batch in enumerate(train_loader):
                 queue = [
-                    {"batch": next(iter(train_loader)), "task": task}
+                    {"batch": next(train_loader_iteration), "task": task}
                     for task, train_loader in zip(list_of_tasks, train_loaders)
                 ]
 
@@ -365,7 +366,7 @@ def main():
         print("skipping training")
 
     # save last model
-    model.save(os.path.join(args.save, "model_last.pt"))
+    torch.save(model, os.path.join(args.save, "model_last.pt"))
     print("Saving new last model")
 
 

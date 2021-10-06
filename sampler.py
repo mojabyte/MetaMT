@@ -50,7 +50,6 @@ class TaskSampler(Sampler):
                 self.items_per_label[label].append(item)
             else:
                 self.items_per_label[label] = [item]
-        print(self.items_per_label.keys())
 
     def __len__(self):
         return self.n_tasks

@@ -20,7 +20,7 @@ def reptile_learner(model, queue, optimizer, args):
             optimizer.zero_grad()
             # logits, _ = model.forward(support_images)
             output = model.forward(queue[i]["task"], queue[i]["batch"][0])
-            print("\n" + "-" * 10 + "\n", "reptile:", output)
+            print("\n" + "-" * 80 + "\n", "reptile:", output)
             loss = output[0].mean()
             # loss_cls = criterion(logits, support_labels)
             # loss_cls = loss_cls.mean()

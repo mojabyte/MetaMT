@@ -89,7 +89,7 @@ class BertMetaLearning(nn.Module):
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
             data["label"] = data["label"].to(self.device)
 
-            print("\n" + "-" * 10 + "\n", "model:", data)
+            print("\n" + "-" * 80 + "\n", "model:", data)
 
             outputs = self.clf_model(
                 data["input_ids"],

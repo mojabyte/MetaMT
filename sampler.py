@@ -44,7 +44,6 @@ class TaskSampler(Sampler):
         self.items_per_label = {}
 
         for item, label in enumerate(dataset.data["label"].tolist()):
-            print("\n" + "-" * 10 + "\n", "sampler:", dataset.data["label"].tolist())
             if label in self.items_per_label.keys():
                 self.items_per_label[label].append(item)
             else:

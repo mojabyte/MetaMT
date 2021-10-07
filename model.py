@@ -14,7 +14,7 @@ class BertMetaLearning(nn.Module):
         self.device = None
 
         # self.bert = BertModel.from_pretrained('saved/multi_cased_L-12_H-768_A-12_pytorch/', local_files_only=True)
-        self.model = AutoModel.from_pretrained()
+        self.model = AutoModel.from_pretrained(MODEL_NAME)
 
         # Question Answering
         self.qa_outputs = nn.Linear(args.hidden_dims, args.qa_labels)

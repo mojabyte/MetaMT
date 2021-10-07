@@ -104,7 +104,7 @@ class CorpusSC(Dataset):
 
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, do_lower_case=False)
 
-        self.labels = {"contradiction": 0, "entailment": 1, "neutral": 2}
+        self.label_dict = {"contradiction": 0, "entailment": 1, "neutral": 2}
 
         if os.path.exists(path + ".pickle"):
             self.data = pickle.load(open(path + ".pickle", "rb"))
@@ -195,7 +195,7 @@ class CorpusSC(Dataset):
                     input_ids, token_type_ids, attention_mask = self.encode(
                         sentence1_tokenized, sentence2_tokenized
                     )
-                    labels.append(self.labels[label])
+                    labels.append(self.label_dict[label])
                     token_ids.append(torch.unsqueeze(input_ids, dim=0))
                     seg_ids.append(torch.unsqueeze(token_type_ids, dim=0))
                     mask_ids.append(torch.unsqueeze(attention_mask, dim=0))

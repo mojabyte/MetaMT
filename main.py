@@ -213,11 +213,7 @@ def main():
 
     # params = list(model.parameters())
 
-    steps = (
-        args.meta_epochs
-        * args.meta_iteration
-        // (len(list_of_tasks) * args.update_step)
-    )
+    steps = args.epochs * args.meta_iteration // (len(list_of_tasks) * args.update_step)
 
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [

@@ -42,9 +42,6 @@ class TaskSampler(Sampler):
         self.n_tasks = n_tasks
 
         self.items_per_label = {}
-        assert hasattr(
-            dataset, "labels"
-        ), "TaskSampler needs a dataset with a field 'label' containing the labels of all images."
         for item, label in enumerate(dataset.data["label"].tolist()):
             if label in self.items_per_label.keys():
                 self.items_per_label[label].append(item)

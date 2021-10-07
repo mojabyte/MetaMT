@@ -13,7 +13,7 @@ from helper import *
 
 # bert-base-multilingual-cased
 # xlm-roberta-base
-MODEL_NAME = "bert-base-multilingual-cased"
+MODEL_NAME = "xlm-roberta-base"
 
 
 class CorpusQA(Dataset):

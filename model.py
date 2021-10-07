@@ -5,7 +5,7 @@ from transformers import AutoModel, AutoModelForSequenceClassification
 
 # bert-base-multilingual-cased
 # xlm-roberta-base
-MODEL_NAME = "bert-base-multilingual-cased"
+MODEL_NAME = "xlm-roberta-base"
 
 
 class BertMetaLearning(nn.Module):
@@ -88,6 +88,8 @@ class BertMetaLearning(nn.Module):
             data["attention_mask"] = data["attention_mask"].to(self.device)
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
             data["label"] = data["label"].to(self.device)
+
+            print("\n" + "-" * 10 + "\n", "model:", data)
 
             outputs = self.clf_model(
                 data["input_ids"],

@@ -38,7 +38,6 @@ parser.add_argument("--pa_batch_size", type=int, default=8, help="batch size")
 parser.add_argument("--task_per_queue", type=int, default=8, help="")
 parser.add_argument("--update_step", type=int, default=3, help="")
 parser.add_argument("--beta", type=float, default=1.0, help="")
-parser.add_argument("--meta_epochs", type=int, default=5, help="iterations")  # 5
 
 # ---------------
 parser.add_argument("--epochs", type=int, default=5, help="iterations")  # 5

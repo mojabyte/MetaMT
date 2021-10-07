@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import AutoModel
+from transformers import AutoModel, AutoModelForSequenceClassification
 
 
 # "bert-base-multilingual-cased"
@@ -15,6 +15,9 @@ class BertMetaLearning(nn.Module):
 
         # self.bert = BertModel.from_pretrained('saved/multi_cased_L-12_H-768_A-12_pytorch/', local_files_only=True)
         self.model = AutoModel.from_pretrained(MODEL_NAME)
+        self.clf_model = AutoModelForSequenceClassification.from_pretrained(
+            MODEL_NAME, num_labels=3
+        )
 
         # Question Answering
         self.qa_outputs = nn.Linear(args.hidden_dims, args.qa_labels)
@@ -85,20 +88,12 @@ class BertMetaLearning(nn.Module):
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
             data["label"] = data["label"].to(self.device)
 
-            outputs = self.model(
+            outputs = self.clf_model(
                 data["input_ids"],
-                attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
+                attention_mask=data["attention_mask"],
+                labels=data["label"],
             )
-
-            batch_size = data["input_ids"].shape[0]
-            pooled_output = outputs[1]
-
-            pooled_output = self.sc_dropout(pooled_output)
-            logits = self.sc_classifier(pooled_output)
-
-            loss = F.cross_entropy(logits, data["label"], reduction="none")
-            outputs = (loss, logits) + outputs[2:]
 
         elif "pa" in task:
 
@@ -180,6 +175,7 @@ class BertMetaLearning(nn.Module):
         self = super().to(*args, **kwargs)
         self.device = args[0]  # store device
         self.model = self.model.to(*args, **kwargs)
+        self.clf_model = self.clf_model.to(*args, **kwargs)
         self.qa_outputs = self.qa_outputs.to(*args, **kwargs)
         self.tc_dropout = self.tc_dropout.to(*args, **kwargs)
         self.tc_classifier = self.tc_classifier.to(*args, **kwargs)

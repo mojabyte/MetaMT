@@ -126,30 +126,35 @@ class CorpusSC(Dataset):
         # labels = []
 
         if file == "csv":
-            # header = ["premise", "hypothesis", "label"]
-            # df = pd.read_csv(path, sep="\t", header=None, names=header)
+            header = ["premise", "hypothesis", "label"]
+            df = pd.read_csv(path, sep="\t", header=None, names=header)
 
-            # premise_list = df["premise"].to_list()
-            # hypothesis_list = df["hypothesis"].to_list()
-            # label_list = df["label"].to_list()
+            premise_list = df["premise"].to_list()
+            hypothesis_list = df["hypothesis"].to_list()
+            label_list = df["label"].to_list()
 
-            # # Tokenize input pair sentences
-            # ids = self.tokenizer(
-            #     premise_list,
-            #     hypothesis_list,
-            #     add_special_tokens=True,
-            #     max_length=self.max_sequence_length,
-            #     truncation=True,
-            #     padding=True,
-            #     return_attention_mask=True,
-            #     return_token_type_ids=True,
-            #     return_tensors="pt",
-            # )
-            # token_ids = ids["input_ids"]
-            # mask_ids = ids["attention_mask"]
-            # seg_ids = ids["token_type_ids"]
+            # Tokenize input pair sentences
+            ids = self.tokenizer(
+                premise_list,
+                hypothesis_list,
+                add_special_tokens=True,
+                max_length=self.max_sequence_length,
+                truncation=True,
+                padding=True,
+                return_attention_mask=True,
+                return_token_type_ids=True,
+                return_tensors="pt",
+            )
+            token_ids = ids["input_ids"]
+            mask_ids = ids["attention_mask"]
+            seg_ids = ids["token_type_ids"]
 
-            # labels = torch.tensor([self.label_dict[label] for label in label_list])
+            labels = torch.tensor([self.label_dict[label] for label in label_list])
+
+            print("token_ids:", token_ids[:3])
+            print("mask_ids:", mask_ids[:3])
+            print("seg_ids:", seg_ids[:3])
+            print("labels:", labels[:3])
 
             with open(path, encoding="utf-8") as f:
                 reader = csv.reader(f, delimiter="\t")
@@ -204,6 +209,11 @@ class CorpusSC(Dataset):
         list_input_ids = torch.cat(list_input_ids, dim=0)
         list_token_type_ids = torch.cat(list_token_type_ids, dim=0)
         list_attention_mask = torch.cat(list_attention_mask, dim=0)
+
+        print("list_input_ids:", list_input_ids[:3])
+        print("list_attention_mask:", list_attention_mask[:3])
+        print("list_token_type_ids:", list_token_type_ids[:3])
+        print("list_label:", list_label[:3])
 
         dataset = {
             "input_ids": list_input_ids,

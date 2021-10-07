@@ -16,7 +16,7 @@ def reptile_learner(model, queue, optimizer, args):
     losses = 0
 
     for i in range(n):
-        for k in range(args.update_step):
+        for _ in range(args.update_step):
             optimizer.zero_grad()
             # logits, _ = model.forward(support_images)
             output = model.forward(queue[i]["task"], queue[i]["batch"][0])

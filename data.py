@@ -4,7 +4,6 @@ from tqdm import tqdm
 import json, os
 import pandas as pd
 
-import csv
 import pickle5 as pickle
 
 from torch.utils.data import Dataset
@@ -13,7 +12,8 @@ from helper import *
 
 
 # bert-base-multilingual-cased
-MODEL_NAME = "xlm-roberta-base"
+# xlm-roberta-base
+MODEL_NAME = "bert-base-multilingual-cased"
 
 
 class CorpusQA(Dataset):

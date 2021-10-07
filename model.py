@@ -3,8 +3,9 @@ import torch.nn.functional as F
 from transformers import AutoModel, AutoModelForSequenceClassification
 
 
-# "bert-base-multilingual-cased"
-MODEL_NAME = "xlm-roberta-base"
+# bert-base-multilingual-cased
+# xlm-roberta-base
+MODEL_NAME = "bert-base-multilingual-cased"
 
 
 class BertMetaLearning(nn.Module):
@@ -16,7 +17,7 @@ class BertMetaLearning(nn.Module):
         # self.bert = BertModel.from_pretrained('saved/multi_cased_L-12_H-768_A-12_pytorch/', local_files_only=True)
         self.model = AutoModel.from_pretrained(MODEL_NAME)
         self.clf_model = AutoModelForSequenceClassification.from_pretrained(
-            MODEL_NAME, num_labels=3
+            MODEL_NAME, num_labels=args.tc_labels
         )
 
         # Question Answering

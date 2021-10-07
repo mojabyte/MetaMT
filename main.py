@@ -6,8 +6,8 @@ from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from model import BertMetaLearning
 from datapath import loc, get_loc
 
-import torch_xla
-import torch_xla.core.xla_model as xm
+# import torch_xla
+# import torch_xla.core.xla_model as xm
 
 from sampler import TaskSampler
 from learners.reptile_learner import reptile_learner
@@ -155,9 +155,11 @@ def main():
 
         torch.cuda.manual_seed_all(args.seed)
 
-    DEVICE = (
-        xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
-    )
+    # DEVICE = (
+    #     xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
+    # )
+
+    DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
     # loader
     train_loaders = []

@@ -1,6 +1,7 @@
 import torch
-import torch_xla
-import torch_xla.core.xla_model as xm
+
+# import torch_xla
+# import torch_xla.core.xla_model as xm
 
 
 ## According to the article, this learner does not use query set
@@ -31,14 +32,13 @@ def reptile_learner(model, queue, optimizer, args):
 
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
 
-            if args.tpu:
-                # Optimizer for TPU
-                xm.optimizer_step(optimizer, barrier=True)
-            else:
-                # Optimizer for GPU
-                optimizer.step()
-
-
+            # if args.tpu:
+            #     # Optimizer for TPU
+            #     xm.optimizer_step(optimizer, barrier=True)
+            # else:
+            #     # Optimizer for GPU
+            #     optimizer.step()
+            optimizer.step()
 
         if running_vars == []:
             for _, param in enumerate(model.parameters()):

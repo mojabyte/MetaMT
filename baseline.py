@@ -9,8 +9,8 @@ from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 from model import BertMetaLearning
 from datapath import get_loc
 
-import torch_xla
-import torch_xla.core.xla_model as xm
+# import torch_xla
+# import torch_xla.core.xla_model as xm
 
 from transformers import (
     AdamW,
@@ -89,7 +89,8 @@ if torch.cuda.is_available():
 
     torch.cuda.manual_seed_all(args.seed)
 
-DEVICE = xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
+# DEVICE = xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
+DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
 
 def load_data(task_lang):
@@ -186,12 +187,13 @@ def train(model, task, data):
         to_return += loss.item()
         total_loss += loss.item()
 
-        if args.tpu:
-            # Optimizer for TPU
-            xm.optimizer_step(optim, barrier=True)
-        else:
-            # Optimizer for GPU
-            optim.step()
+        # if args.tpu:
+        #     # Optimizer for TPU
+        #     xm.optimizer_step(optim, barrier=True)
+        # else:
+        #     # Optimizer for GPU
+        #     optim.step()
+        optim.step()
 
         scheduler.step()
 

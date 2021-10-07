@@ -9,6 +9,9 @@ from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 from model import BertMetaLearning
 from datapath import get_loc
 
+import torch_xla
+import torch_xla.core.xla_model as xm
+
 from transformers import (
     AdamW,
     get_linear_schedule_with_warmup,
@@ -46,6 +49,7 @@ parser.add_argument(
 )
 parser.add_argument("--data_dir", type=str, default="data/", help="directory of data")
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
+parser.add_argument("--tpu", action="store_true", help="use TPU")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--model_name", type=str, default="model.pt", help="")
@@ -81,12 +85,11 @@ if not os.path.exists(args.save):
 
 if torch.cuda.is_available():
     if not args.cuda:
-        # print("WARNING: You have a CUDA device, so you should probably run with --cuda")
         args.cuda = True
 
     torch.cuda.manual_seed_all(args.seed)
 
-DEVICE = torch.device("cuda" if args.cuda else "cpu")
+DEVICE = xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
 
 
 def load_data(task_lang):
@@ -182,7 +185,14 @@ def train(model, task, data):
         torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
         to_return += loss.item()
         total_loss += loss.item()
-        optim.step()
+
+        if args.tpu:
+            # Optimizer for TPU
+            xm.optimizer_step(optim, barrier=True)
+        else:
+            # Optimizer for GPU
+            optim.step()
+
         scheduler.step()
 
         if (j + 1) % args.log_interval == 0:

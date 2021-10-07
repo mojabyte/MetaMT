@@ -6,6 +6,9 @@ from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from model import BertMetaLearning
 from datapath import loc, get_loc
 
+import torch_xla
+import torch_xla.core.xla_model as xm
+
 from sampler import TaskSampler
 from learners.reptile_learner import reptile_learner
 
@@ -62,6 +65,7 @@ parser.add_argument(
 )
 parser.add_argument("--data_dir", type=str, default="data/", help="directory of data")
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
+parser.add_argument("--tpu", action="store_true", help="use TPU")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--grad_clip", type=float, default=5.0)
@@ -151,7 +155,9 @@ def main():
 
         torch.cuda.manual_seed_all(args.seed)
 
-    DEVICE = torch.device("cuda" if args.cuda else "cpu")
+    DEVICE = (
+        xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
+    )
 
     # loader
     train_loaders = []

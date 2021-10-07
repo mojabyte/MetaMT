@@ -115,15 +115,10 @@ class CorpusSC(Dataset):
 
     def preprocess(self, path, file):
 
-        list_label = []
-        list_input_ids = []
-        list_token_type_ids = []
-        list_attention_mask = []
-
-        # token_ids = []
-        # mask_ids = []
-        # seg_ids = []
-        # labels = []
+        labels = []
+        input_ids = []
+        token_type_ids = []
+        attention_mask = []
 
         if file == "csv":
             header = ["premise", "hypothesis", "label"]
@@ -145,41 +140,36 @@ class CorpusSC(Dataset):
                 return_token_type_ids=True,
                 return_tensors="pt",
             )
-            token_ids = ids["input_ids"]
-            mask_ids = ids["attention_mask"]
-            seg_ids = ids["token_type_ids"]
+            input_ids = ids["input_ids"]
+            attention_mask = ids["attention_mask"]
+            token_type_ids = ids["token_type_ids"]
 
             labels = torch.tensor([self.label_dict[label] for label in label_list])
 
-            print("token_ids:", token_ids[:3])
-            print("mask_ids:", mask_ids[:3])
-            print("seg_ids:", seg_ids[:3])
-            print("labels:", labels[:3])
+            # with open(path, encoding="utf-8") as f:
+            #     reader = csv.reader(f, delimiter="\t")
+            #     for line in reader:
+            #         try:
+            #             label = line[2]
+            #         except:
+            #             print(line)
+            #         sentence1_tokenized = self.tokenizer.tokenize(line[0])
+            #         sentence2_tokenized = self.tokenizer.tokenize(line[1])
 
-            with open(path, encoding="utf-8") as f:
-                reader = csv.reader(f, delimiter="\t")
-                for line in reader:
-                    try:
-                        label = line[2]
-                    except:
-                        print(line)
-                    sentence1_tokenized = self.tokenizer.tokenize(line[0])
-                    sentence2_tokenized = self.tokenizer.tokenize(line[1])
+            #         if (
+            #             len(sentence1_tokenized) + len(sentence2_tokenized) + 3
+            #             > self.max_sequence_length
+            #         ):
+            #             continue
 
-                    if (
-                        len(sentence1_tokenized) + len(sentence2_tokenized) + 3
-                        > self.max_sequence_length
-                    ):
-                        continue
+            #         input_ids, token_type_ids, attention_mask = self.encode(
+            #             sentence1_tokenized, sentence2_tokenized
+            #         )
 
-                    input_ids, token_type_ids, attention_mask = self.encode(
-                        sentence1_tokenized, sentence2_tokenized
-                    )
-
-                    list_label.append(self.label_dict[label])
-                    list_input_ids.append(torch.unsqueeze(input_ids, dim=0))
-                    list_token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
-                    list_attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
+            #         list_label.append(self.label_dict[label])
+            #         list_input_ids.append(torch.unsqueeze(input_ids, dim=0))
+            #         list_token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
+            #         list_attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
         else:
             with open(path, encoding="utf-8") as f:
                 data = [json.loads(jline) for jline in f.readlines()]
@@ -200,34 +190,22 @@ class CorpusSC(Dataset):
                     input_ids, token_type_ids, attention_mask = self.encode(
                         sentence1_tokenized, sentence2_tokenized
                     )
-                    list_label.append(self.label_dict[label])
-                    list_input_ids.append(torch.unsqueeze(input_ids, dim=0))
-                    list_token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
-                    list_attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
+                    labels.append(self.label_dict[label])
+                    input_ids.append(torch.unsqueeze(input_ids, dim=0))
+                    token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
+                    attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
 
-        list_label = torch.tensor(list_label)
-        list_input_ids = torch.cat(list_input_ids, dim=0)
-        list_token_type_ids = torch.cat(list_token_type_ids, dim=0)
-        list_attention_mask = torch.cat(list_attention_mask, dim=0)
-
-        print("list_input_ids:", list_input_ids[:3])
-        print("list_attention_mask:", list_attention_mask[:3])
-        print("list_token_type_ids:", list_token_type_ids[:3])
-        print("list_label:", list_label[:3])
+        # list_label = torch.tensor(list_label)
+        # list_input_ids = torch.cat(list_input_ids, dim=0)
+        # list_token_type_ids = torch.cat(list_token_type_ids, dim=0)
+        # list_attention_mask = torch.cat(list_attention_mask, dim=0)
 
         dataset = {
-            "input_ids": list_input_ids,
-            "token_type_ids": list_token_type_ids,
-            "attention_mask": list_attention_mask,
-            "label": list_label,
+            "input_ids": input_ids,
+            "token_type_ids": token_type_ids,
+            "attention_mask": attention_mask,
+            "label": labels,
         }
-
-        # dataset = {
-        #     "input_ids": token_ids,
-        #     "token_type_ids": seg_ids,
-        #     "attention_mask": mask_ids,
-        #     "label": labels,
-        # }
 
         return dataset
 

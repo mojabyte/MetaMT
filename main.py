@@ -290,8 +290,6 @@ def main():
                     for i, task in enumerate(list_of_tasks)
                 ]
 
-                print("\n" + "-" * 80 + "\n", "queue:", queue)
-
                 # == Data preparation ===========
                 # support_data, support_labels, query_data, query_labels = batch
                 # support_data, query_data = batch

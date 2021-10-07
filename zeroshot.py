@@ -1,7 +1,5 @@
 import os, json, argparse, torch, logging, warnings
 
-# import pickle
-
 import numpy as np
 from torch.utils.data import DataLoader
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA

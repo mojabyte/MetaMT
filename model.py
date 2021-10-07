@@ -1,6 +1,10 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import BertModel
+from transformers import AutoModel
+
+
+# "bert-base-multilingual-cased"
+MODEL_NAME = "xlm-roberta-base"
 
 
 class BertMetaLearning(nn.Module):
@@ -10,7 +14,7 @@ class BertMetaLearning(nn.Module):
         self.device = None
 
         # self.bert = BertModel.from_pretrained('saved/multi_cased_L-12_H-768_A-12_pytorch/', local_files_only=True)
-        self.bert = BertModel.from_pretrained("bert-base-multilingual-cased")
+        self.model = AutoModel.from_pretrained()
 
         # Question Answering
         self.qa_outputs = nn.Linear(args.hidden_dims, args.qa_labels)
@@ -39,7 +43,7 @@ class BertMetaLearning(nn.Module):
             data["attention_mask"] = data["attention_mask"].to(self.device)
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
 
-            outputs = self.bert(
+            outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
@@ -81,7 +85,7 @@ class BertMetaLearning(nn.Module):
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
             data["label"] = data["label"].to(self.device)
 
-            outputs = self.bert(
+            outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
@@ -103,7 +107,7 @@ class BertMetaLearning(nn.Module):
             data["token_type_ids"] = data["token_type_ids"].to(self.device)
             data["label"] = data["label"].to(self.device)
 
-            outputs = self.bert(
+            outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
@@ -126,7 +130,7 @@ class BertMetaLearning(nn.Module):
             data["mask"] = data["mask"].float().to(self.device)
             data["label_ids"] = data["label_ids"].to(self.device)
 
-            outputs = self.bert(
+            outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
@@ -152,7 +156,7 @@ class BertMetaLearning(nn.Module):
             data["mask"] = data["mask"].float().to(self.device)
             data["label_ids"] = data["label_ids"].to(self.device)
 
-            outputs = self.bert(
+            outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
                 token_type_ids=data["token_type_ids"],
@@ -175,7 +179,7 @@ class BertMetaLearning(nn.Module):
     def to(self, *args, **kwargs):
         self = super().to(*args, **kwargs)
         self.device = args[0]  # store device
-        self.bert = self.bert.to(*args, **kwargs)
+        self.model = self.model.to(*args, **kwargs)
         self.qa_outputs = self.qa_outputs.to(*args, **kwargs)
         self.tc_dropout = self.tc_dropout.to(*args, **kwargs)
         self.tc_classifier = self.tc_classifier.to(*args, **kwargs)

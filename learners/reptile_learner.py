@@ -51,13 +51,9 @@ def reptile_learner(model, queue, optimizer, device, args):
 
         parameters_time = time.time()
 
-        print(old_vars[0])
-
         for idx, param in enumerate(model.parameters()):
             running_vars[idx].data += param.data.clone()
             param.data = old_vars[idx].data.clone()
-
-        print(running_vars[0])
 
         print(f"parameters update: {time.time() - parameters_time}")
 

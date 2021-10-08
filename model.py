@@ -5,7 +5,7 @@ from transformers import AutoModel, AutoModelForSequenceClassification
 
 # bert-base-multilingual-cased
 # xlm-roberta-base
-MODEL_NAME = "bert-base-multilingual-cased"
+MODEL_NAME = "xlm-roberta-base"
 
 
 class BertMetaLearning(nn.Module):

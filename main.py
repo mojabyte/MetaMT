@@ -219,7 +219,7 @@ def main():
         print(f"loading model {args.load}...")
         model = torch.load(args.load)
 
-    steps = args.epochs * args.meta_iteration // (len(list_of_tasks) * args.update_step)
+    steps = args.epochs * args.meta_iteration
 
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [

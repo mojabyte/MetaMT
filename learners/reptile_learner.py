@@ -9,10 +9,10 @@ import torch
 def reptile_learner(model, queue, optimizer, args):
     model.train()
 
-    old_vars = []
+    old_vars = [param.data.clone() for param in model.parameters()]
     running_vars = []
-    for param in model.parameters():
-        old_vars.append(param.data.clone())
+
+    print(old_vars)
 
     queue_length = len(queue)
     losses = 0
@@ -52,14 +52,13 @@ def reptile_learner(model, queue, optimizer, args):
         parameters_time = time.time()
 
         if running_vars == []:
-            for _, param in enumerate(model.parameters()):
+            for idx, param in enumerate(model.parameters()):
                 running_vars.append(param.data.clone())
+                param.data = old_vars[idx].data.clone()
         else:
             for idx, param in enumerate(model.parameters()):
                 running_vars[idx].data += param.data.clone()
-
-        for idx, param in enumerate(model.parameters()):
-            param.data = old_vars[idx].data.clone()
+                param.data = old_vars[idx].data.clone()
 
         print(f"parameters update: {time.time() - parameters_time}")
 
@@ -76,6 +75,7 @@ def reptile_learner(model, queue, optimizer, args):
         )
 
     print(f"calculate params: {time.time() - calculate_params_time}")
+    print("-" * 80)
 
     return losses / (queue_length * args.update_step)
 

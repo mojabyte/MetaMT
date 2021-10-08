@@ -61,8 +61,10 @@ def reptile_learner(model, queue, optimizer, device, args):
 
     calculate_params_time = time.time()
 
+    print(running_vars[0])
     for param in running_vars:
         param /= queue_length
+    print(running_vars[0])
 
     for idx, param in enumerate(model.parameters()):
         param.data = old_vars[idx].data + args.beta * (

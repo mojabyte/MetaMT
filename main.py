@@ -246,9 +246,9 @@ def main():
     ]
 
     optim = AdamW(optimizer_grouped_parameters, lr=args.meta_lr, eps=args.adam_epsilon)
-    scheduler = get_linear_schedule_with_warmup(
-        optim, num_warmup_steps=args.warmup, num_training_steps=steps
-    )
+    # scheduler = get_linear_schedule_with_warmup(
+    #     optim, num_warmup_steps=args.warmup, num_training_steps=steps
+    # )
 
     logger = {}
     logger["total_val_loss"] = []
@@ -363,7 +363,7 @@ def main():
                             print("Saving " + task + "  Model")
                     total_loss = 0
 
-                scheduler.step()
+                # scheduler.step()
 
     except KeyboardInterrupt:
         print("skipping training")

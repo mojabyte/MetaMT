@@ -6,11 +6,13 @@ import torch
 # import torch_xla.core.xla_model as xm
 
 
-def reptile_learner(model, queue, optimizer, args):
+def reptile_learner(model, queue, optimizer, device, args):
     model.train()
 
     old_vars = [param.data.clone() for param in model.parameters()]
-    running_vars = [torch.zeros(param.shape) for param in model.parameters()]
+    running_vars = [
+        torch.zeros(param.shape, device=device) for param in model.parameters()
+    ]
 
     queue_length = len(queue)
     losses = 0

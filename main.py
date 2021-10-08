@@ -300,7 +300,7 @@ def main():
                 ]
 
                 ## == train ===================
-                loss = reptile_learner(model, queue, optim, args)
+                loss = reptile_learner(model, queue, optim, DEVICE, args)
                 # loss, prototypes = pt_learner(
                 #     model,
                 #     support_images,

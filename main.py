@@ -81,6 +81,7 @@ parser.add_argument("--max_answer_length", default=30, type=int)  # 30
 parser.add_argument(
     "--weight_decay", default=0.0, type=float, help="Weight decay if we apply some."
 )
+parser.add_argument("--scheduler", action="store_true", help="use scheduler")
 parser.add_argument("--warmup", default=0, type=int)
 parser.add_argument(
     "--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer."
@@ -356,7 +357,8 @@ def main():
                             print("Saving " + task + "  Model")
                     total_loss = 0
 
-                scheduler.step()
+                if args.scheduler:
+                    scheduler.step()
 
     except KeyboardInterrupt:
         print("skipping training")

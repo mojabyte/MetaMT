@@ -1,13 +1,12 @@
+import time
 import torch
+
 
 # import torch_xla
 # import torch_xla.core.xla_model as xm
 
 
-## According to the article, this learner does not use query set
 def reptile_learner(model, queue, optimizer, args):
-    # Support_set: [shot_num*ways, C, H, W], [shot_num*ways]
-    # Query_set:   [q_num*ways,    C, H, W], [q_num*ways]
     model.train()
 
     old_vars = []
@@ -15,18 +14,26 @@ def reptile_learner(model, queue, optimizer, args):
     for param in model.parameters():
         old_vars.append(param.data.clone())
 
-    n = len(queue)
+    queue_length = len(queue)
     losses = 0
 
-    for i in range(n):
+    global_time = time.time()
+
+    for i in range(queue_length):
+        task_time = time.time()
         for _ in range(args.update_step):
             optimizer.zero_grad()
-            # logits, _ = model.forward(support_images)
-            output = model.forward(queue[i]["task"], queue[i]["batch"][0])
+
+            support_data = queue[i]["batch"][0]
+            task = queue[i]["task"]
+
+            output = model.forward(task, support_data)
             loss = output[0].mean()
+
             # loss_cls = criterion(logits, support_labels)
             # loss_cls = loss_cls.mean()
             # loss = loss_cls
+
             loss.backward()
             losses += loss.item()
 
@@ -40,6 +47,10 @@ def reptile_learner(model, queue, optimizer, args):
             #     optimizer.step()
             optimizer.step()
 
+        print(f"k-step update: {time.time() - task_time}")
+
+        parameters_time = time.time()
+
         if running_vars == []:
             for _, param in enumerate(model.parameters()):
                 running_vars.append(param.data.clone())
@@ -50,15 +61,23 @@ def reptile_learner(model, queue, optimizer, args):
         for idx, param in enumerate(model.parameters()):
             param.data = old_vars[idx].data.clone()
 
+        print(f"parameters update: {time.time() - parameters_time}")
+
+    print(f"queue train: {time.time() - global_time}")
+
+    calculate_params_time = time.time()
+
     for param in running_vars:
-        param /= n
+        param /= queue_length
 
     for idx, param in enumerate(model.parameters()):
         param.data = old_vars[idx].data + args.beta * (
             running_vars[idx].data - old_vars[idx].data
         )
 
-    return losses / (n * args.update_step)
+    print(f"calculate params: {time.time() - calculate_params_time}")
+
+    return losses / (queue_length * args.update_step)
 
 
 def reptile_evaluate(model, dataloader, criterion, device):

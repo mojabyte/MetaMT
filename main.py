@@ -219,8 +219,6 @@ def main():
         print(f"loading model {args.load}...")
         model = torch.load(args.load)
 
-    # params = list(model.parameters())
-
     steps = args.epochs * args.meta_iteration // (len(list_of_tasks) * args.update_step)
 
     no_decay = ["bias", "LayerNorm.weight"]
@@ -246,9 +244,12 @@ def main():
     ]
 
     optim = AdamW(optimizer_grouped_parameters, lr=args.meta_lr, eps=args.adam_epsilon)
-    # scheduler = get_linear_schedule_with_warmup(
-    #     optim, num_warmup_steps=args.warmup, num_training_steps=steps
-    # )
+    scheduler = get_linear_schedule_with_warmup(
+        optim,
+        num_warmup_steps=args.warmup,
+        num_training_steps=steps,
+        last_epoch=args.start_epoch - 1,
+    )
 
     logger = {}
     logger["total_val_loss"] = []
@@ -292,17 +293,11 @@ def main():
             ]
             for miteration_item in range(args.meta_iteration):
 
-                # for miteration_item, batch in enumerate(train_loader):
+                # == Data preparation ===========
                 queue = [
                     {"batch": next(train_loader_iterations[i]), "task": task}
                     for i, task in enumerate(list_of_tasks)
                 ]
-
-                # == Data preparation ===========
-                # support_data, support_labels, query_data, query_labels = batch
-                # support_data, query_data = batch
-
-                # imshow(support_images)
 
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, args)
@@ -331,8 +326,6 @@ def main():
                     #     model, val_dataloader, prototypes, criterion, device
                     # )  # For Pt.
 
-                    # print losses
-
                     loss_per_task = {}
                     for task in val_loss_dict.keys():
                         if task[:2] in loss_per_task.keys():
@@ -343,7 +336,7 @@ def main():
                             loss_per_task[task[:2]] = val_loss_dict[task]
 
                     print(
-                        "Time : %f , Step  : %d , Train Loss : %f, Val Loss : %f"
+                        "Time: %f, Step: %d, Train Loss: %f, Val Loss: %f"
                         % (
                             time.time() - global_time,
                             miteration_item + 1,
@@ -363,7 +356,7 @@ def main():
                             print("Saving " + task + "  Model")
                     total_loss = 0
 
-                # scheduler.step()
+                scheduler.step()
 
     except KeyboardInterrupt:
         print("skipping training")

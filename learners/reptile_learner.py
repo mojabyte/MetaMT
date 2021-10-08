@@ -34,12 +34,10 @@ def reptile_learner(model, queue, optimizer, device, args):
 
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
 
-            if args.tpu:
-                # Optimizer for TPU
-                xm.optimizer_step(optimizer, barrier=True)
-            else:
-                # Optimizer for GPU
-                optimizer.step()
+            # Optimizer for TPU
+            xm.optimizer_step(optimizer, barrier=True)
+
+            # Optimizer for GPU
             # optimizer.step()
 
         for idx, param in enumerate(model.parameters()):

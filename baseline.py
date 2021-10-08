@@ -89,8 +89,8 @@ if torch.cuda.is_available():
 
     torch.cuda.manual_seed_all(args.seed)
 
-# DEVICE = xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
-DEVICE = torch.device("cuda" if args.cuda else "cpu")
+DEVICE = xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
+# DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
 
 def load_data(task_lang):
@@ -187,12 +187,10 @@ def train(model, task, data):
         to_return += loss.item()
         total_loss += loss.item()
 
-        if args.tpu:
-            # Optimizer for TPU
-            xm.optimizer_step(optim, barrier=True)
-        else:
-            # Optimizer for GPU
-            optim.step()
+        # Optimizer for TPU
+        xm.optimizer_step(optim, barrier=True)
+
+        # Optimizer for GPU
         # optim.step()
 
         scheduler.step()

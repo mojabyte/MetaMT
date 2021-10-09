@@ -86,6 +86,7 @@ parser.add_argument(
 )
 parser.add_argument("--scheduler", action="store_true", help="use scheduler")
 parser.add_argument("--step_size", default=3000, type=int)
+parser.add_argument("--last_step", default=0, type=int)
 parser.add_argument("--gamma", default=0.1, type=float)
 parser.add_argument("--warmup", default=0, type=int)
 parser.add_argument(
@@ -226,7 +227,7 @@ def main():
         print(f"loading model {args.load}...")
         model = torch.load(args.load)
 
-    steps = args.epochs * args.meta_iteration
+    # steps = args.epochs * args.meta_iteration
 
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
@@ -261,7 +262,7 @@ def main():
         optim,
         step_size=args.step_size,
         gamma=args.gamma,
-        last_epoch=args.start_epoch - 1,
+        last_epoch=args.last_step - 1,
     )
 
     logger = {}

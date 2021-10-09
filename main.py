@@ -83,6 +83,7 @@ parser.add_argument(
     "--weight_decay", default=0.0, type=float, help="Weight decay if we apply some."
 )
 parser.add_argument("--scheduler", action="store_true", help="use scheduler")
+parser.add_argument("--step_size", default=3000, type=int)
 parser.add_argument("--gamma", default=0.1, type=float)
 parser.add_argument("--warmup", default=0, type=int)
 parser.add_argument(
@@ -254,7 +255,10 @@ def main():
     #     last_epoch=args.start_epoch - 1,
     # )
     scheduler = StepLR(
-        optim, step_size=3000, gamma=args.gamma, last_epoch=args.start_epoch - 1
+        optim,
+        step_size=args.step_size,
+        gamma=args.gamma,
+        last_epoch=args.start_epoch - 1,
     )
 
     logger = {}

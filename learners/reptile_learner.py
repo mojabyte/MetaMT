@@ -48,7 +48,7 @@ def reptile_learner(model, queue, optimizer, device, args):
             param.data = old_vars[idx].data.clone()
 
     for param in running_vars:
-        param /= queue_length
+        param.data /= queue_length
 
     for idx, param in enumerate(model.parameters()):
         param.data = old_vars[idx].data + args.beta * (

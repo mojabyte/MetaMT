@@ -1,7 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import AutoModel, AutoModelForSequenceClassification
+from transformers import AutoModel, AutoModelForSequenceClassification, logging
 
+
+logging.set_verbosity_error()
 
 # bert-base-multilingual-cased
 # xlm-roberta-base

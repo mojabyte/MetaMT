@@ -79,16 +79,26 @@ class TaskSampler(Sampler):
                 - an image as a torch Tensor
                 - the label of this image
         Returns:
-            tuple(Tensor, Tensor, Tensor, Tensor): respectively:
-                - support images,
-                - their labels,
-                - query images,
-                - their labels,
+            list({
+                support: {key: Tensor for key in input_data},
+                query: {key: Tensor for key in input_data}
+            }) with length of reptile_step
         """
         input_data.sort(key=lambda item: item["label"])
         input_data = LD2DT(input_data)
 
         def split_tensor(tensor):
+            """
+            Function to split the input tensor into a list of support & query data with
+            the length of reptile_step
+            Args:
+                tensor: input tensor (number of samples) x (data dimension)
+            Returns:
+                list([
+                    Tensor((n_way * n_shot) x (data dimension)),
+                    Tensor((n_way * n_query) x (data dimension))
+                ]) with the length of reptile_step
+            """
             tensor = tensor.reshape(
                 (
                     self.n_way,
@@ -105,19 +115,17 @@ class TaskSampler(Sampler):
                 for item in tensor_list
             ]
 
-            # reptile_step x [n_way * n_shot, n_way * n_query]
             return tensor_list
 
         data = {k: split_tensor(v) for k, v in input_data.items()}
         data = [
             {
                 key: {k: v[i][j] for k, v in data.items()}
-                for j, key in enumerate(["support", "key"])
+                for j, key in enumerate(["support", "query"])
             }
             for i in range(self.reptile_step)
         ]
 
-        # reptile_step x {support: {data_key: n_way * n_shot, ...}, query: {data_key: n_way * n_shot, ...}}
         return data
 
 

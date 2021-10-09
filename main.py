@@ -40,7 +40,9 @@ parser.add_argument("--po_batch_size", type=int, default=32, help="batch_size")
 parser.add_argument("--pa_batch_size", type=int, default=8, help="batch size")
 
 parser.add_argument("--task_per_queue", type=int, default=8, help="")
-parser.add_argument("--update_step", type=int, default=3, help="")
+parser.add_argument(
+    "--update_step", type=int, default=3, help="number of REPTILE update steps"
+)
 parser.add_argument("--beta", type=float, default=1.0, help="")
 
 # ---------------
@@ -204,6 +206,7 @@ def main():
             n_shot=args.shot,
             n_query=args.query_num,
             n_tasks=args.meta_iteration,
+            reptile_step=args.update_step,
         )
         train_loader = DataLoader(
             train_corpus,

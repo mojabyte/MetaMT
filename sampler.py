@@ -24,6 +24,7 @@ class TaskSampler(Sampler):
         n_shot: int,
         n_query: int,
         n_tasks: int,
+        reptile_step: int = 3,
     ):
         """
         Args:
@@ -40,6 +41,7 @@ class TaskSampler(Sampler):
         self.n_shot = n_shot
         self.n_query = n_query
         self.n_tasks = n_tasks
+        self.reptile_step = reptile_step
 
         self.items_per_label = {}
 
@@ -58,7 +60,8 @@ class TaskSampler(Sampler):
                 [
                     torch.tensor(
                         random.sample(
-                            self.items_per_label[label], self.n_shot + self.n_query
+                            self.items_per_label[label],
+                            self.reptile_step * (self.n_shot + self.n_query),
                         )
                     )
                     for label in random.sample(self.items_per_label.keys(), self.n_way)
@@ -87,17 +90,34 @@ class TaskSampler(Sampler):
 
         def split_tensor(tensor):
             tensor = tensor.reshape(
-                (self.n_way, (self.n_shot + self.n_query), *tensor.shape[1:])
+                (
+                    self.n_way,
+                    self.reptile_step * (self.n_shot + self.n_query),
+                    *tensor.shape[1:],
+                )
             )
-            support_data, query_data = torch.split(
-                tensor, [self.n_shot, self.n_query], dim=1
-            )
+            tensor_list = torch.chunk(tensor, self.reptile_step, dim=1)
+            tensor_list = [
+                [
+                    split.flatten(end_dim=1)
+                    for split in torch.split(item, [self.n_shot, self.n_query], dim=1,)
+                ]
+                for item in tensor_list
+            ]
 
-            return support_data.flatten(end_dim=1), query_data.flatten(end_dim=1)
+            # reptile_step x [n_way * n_shot, n_way * n_query]
+            return tensor_list
 
         data = {k: split_tensor(v) for k, v in input_data.items()}
-        data = [{k: v[s] for k, v in data.items()} for s in range(2)]
+        data = [
+            {
+                key: {k: v[i][j] for k, v in data.items()}
+                for j, key in enumerate(["support", "key"])
+            }
+            for i in range(self.reptile_step)
+        ]
 
+        # reptile_step x {support: {data_key: n_way * n_shot, ...}, query: {data_key: n_way * n_shot, ...}}
         return data
 
 

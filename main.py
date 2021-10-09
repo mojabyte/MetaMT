@@ -2,6 +2,7 @@ import argparse, time, torch, os, logging, warnings, sys
 
 import numpy as np
 from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import StepLR
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from model import BertMetaLearning
 from datapath import loc, get_loc
@@ -82,6 +83,7 @@ parser.add_argument(
     "--weight_decay", default=0.0, type=float, help="Weight decay if we apply some."
 )
 parser.add_argument("--scheduler", action="store_true", help="use scheduler")
+parser.add_argument("--gamma", default=0.1, type=float)
 parser.add_argument("--warmup", default=0, type=int)
 parser.add_argument(
     "--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer."
@@ -245,11 +247,14 @@ def main():
     ]
 
     optim = AdamW(optimizer_grouped_parameters, lr=args.meta_lr, eps=args.adam_epsilon)
-    scheduler = get_linear_schedule_with_warmup(
-        optim,
-        num_warmup_steps=args.warmup,
-        num_training_steps=steps,
-        last_epoch=args.start_epoch - 1,
+    # scheduler = get_linear_schedule_with_warmup(
+    #     optim,
+    #     num_warmup_steps=args.warmup,
+    #     num_training_steps=steps,
+    #     last_epoch=args.start_epoch - 1,
+    # )
+    scheduler = StepLR(
+        optim, step_size=3000, gamma=args.gamma, last_epoch=args.start_epoch - 1
     )
 
     logger = {}

@@ -530,6 +530,9 @@ def squad_convert_example_to_features(
 
     span_doc_tokens = all_doc_tokens
     while len(spans) * doc_stride < len(all_doc_tokens):
+        print("truncated_query:", truncated_query)
+        print('tokenizer.padding_side == "right"', tokenizer.padding_side == "right")
+        print("span_doc_tokens", span_doc_tokens)
 
         encoded_dict = tokenizer.encode_plus(
             truncated_query if tokenizer.padding_side == "right" else span_doc_tokens,

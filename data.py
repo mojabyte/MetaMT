@@ -1,5 +1,6 @@
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, XLMRobertaTokenizer
+from transformers.data.processors.squad import *
 from tqdm import tqdm
 import json, os
 import pandas as pd
@@ -7,8 +8,6 @@ import pandas as pd
 import pickle5 as pickle
 
 from torch.utils.data import Dataset
-
-from helper import *
 
 
 # bert-base-multilingual-cased
@@ -23,14 +22,16 @@ class CorpusQA(Dataset):
         self.max_seq_len = 384
 
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, do_lower_case=False)
+        self.xlmRobertaTokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_NAME)
 
         self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
 
     def preprocess(self, file, evaluate=False):
-        filename = file.split("/")[-1]
-        cached_features_file = os.path.join(
-            "/".join(file.split("/")[:-1]), "cached_{}".format(filename)
-        )
+        file = file.split("/")
+        filename = file[-1]
+        data_dir = "/".join(file[:-1])
+
+        cached_features_file = os.path.join(data_dir, "cached_{}".format(filename))
 
         # Init features and dataset from cache if it exists
         if os.path.exists(cached_features_file):
@@ -41,15 +42,15 @@ class CorpusQA(Dataset):
                 features_and_dataset["examples"],
             )
         else:
-            processor = SquadProcessor()
+            processor = SquadV1Processor()
             if evaluate:
-                examples = processor.get_dev_examples(file)
+                examples = processor.get_dev_examples(data_dir, filename)
             else:
-                examples = processor.get_train_examples(file)
+                examples = processor.get_train_examples(data_dir, filename)
 
             features, dataset = squad_convert_examples_to_features(
                 examples=examples,
-                tokenizer=self.tokenizer,
+                tokenizer=self.xlmRobertaTokenizer,
                 max_seq_length=self.max_seq_len,
                 doc_stride=self.doc_stride,
                 max_query_length=self.max_query_len,

@@ -42,14 +42,19 @@ class TaskSampler(Sampler):
         self.n_query = n_query
         self.n_tasks = n_tasks
         self.reptile_step = reptile_step
+        self.replacement = False
 
-        self.items_per_label = {}
+        self.indices_per_label = {}
 
-        for item, label in enumerate(dataset.data["label"].tolist()):
-            if label in self.items_per_label.keys():
-                self.items_per_label[label].append(item)
-            else:
-                self.items_per_label[label] = [item]
+        if "label" in dataset.data.keys():
+            for index, label in enumerate(dataset.data["label"].tolist()):
+                if label in self.indices_per_label.keys():
+                    self.indices_per_label[label].append(index)
+                else:
+                    self.indices_per_label[label] = [index]
+        else:
+            self.indices_per_label[0] = range(len(dataset))
+            self.replacement = True
 
     def __len__(self):
         return self.n_tasks
@@ -60,11 +65,17 @@ class TaskSampler(Sampler):
                 [
                     torch.tensor(
                         random.sample(
-                            self.items_per_label[label],
+                            self.indices_per_label[label],
                             self.reptile_step * (self.n_shot + self.n_query),
                         )
                     )
-                    for label in random.sample(self.items_per_label.keys(), self.n_way)
+                    for label in (
+                        random.choices(
+                            list(self.indices_per_label.keys()), k=self.n_way
+                        )
+                        if self.replacement
+                        else random.sample(self.indices_per_label.keys(), self.n_way)
+                    )
                 ]
             )
 
@@ -84,7 +95,9 @@ class TaskSampler(Sampler):
                 query: {key: Tensor for key in input_data}
             }) with length of reptile_step
         """
-        input_data.sort(key=lambda item: item["label"])
+        if "label" in input_data[0].keys():
+            input_data.sort(key=lambda item: item["label"])
+
         input_data = LD2DT(input_data)
 
         def split_tensor(tensor):

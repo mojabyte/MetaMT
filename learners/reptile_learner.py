@@ -1,4 +1,5 @@
 import torch
+from copy import deepcopy
 
 # import torch_xla
 # import torch_xla.core.xla_model as xm
@@ -8,6 +9,7 @@ def reptile_learner(model, queue, optimizer, iteration, args):
     model.train()
 
     old_vars = [param.data.clone() for param in model.parameters()]
+    weights_before = deepcopy(model.state_dict())
     # running_vars = [
     #     torch.zeros(param.shape, device=device) for param in model.parameters()
     # ]
@@ -52,9 +54,19 @@ def reptile_learner(model, queue, optimizer, iteration, args):
     # for idx, param in enumerate(model.parameters()):
     #     param.data += args.beta * running_vars[idx].data
     #     param.data -= args.beta * old_vars[idx].data
+
     beta = args.beta * (1 - iteration / args.meta_iteration)
-    for idx, param in enumerate(model.parameters()):
-        param.data = (1 - beta) * old_vars[idx].data + beta * param.data
+    # for idx, param in enumerate(model.parameters()):
+    #     param.data = (1 - beta) * old_vars[idx].data + beta * param.data
+
+    weights_after = model.state_dict()
+    model.load_state_dict(
+        {
+            name: weights_before[name]
+            + (weights_after[name] - weights_before[name]) * beta
+            for name in weights_before
+        }
+    )
 
     return losses / (queue_length * args.update_step)
 

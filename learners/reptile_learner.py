@@ -1,5 +1,4 @@
 import torch
-import time
 
 # import torch_xla
 # import torch_xla.core.xla_model as xm
@@ -7,8 +6,6 @@ import time
 
 def reptile_learner(model, queue, optimizer, iteration, args):
     model.train()
-
-    update_time = time.time()
 
     old_vars = [param.data.clone() for param in model.parameters()]
     # running_vars = [
@@ -58,8 +55,6 @@ def reptile_learner(model, queue, optimizer, iteration, args):
     beta = args.beta * (1 - iteration / args.meta_iteration)
     for idx, param in enumerate(model.parameters()):
         param.data = (1 - beta) * old_vars[idx].data + beta * param.data
-
-    print("update_time:", time.time() - update_time)
 
     return losses / (queue_length * args.update_step)
 

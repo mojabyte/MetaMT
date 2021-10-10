@@ -43,7 +43,7 @@ parser.add_argument("--task_per_queue", type=int, default=8, help="")
 parser.add_argument(
     "--update_step", type=int, default=3, help="number of REPTILE update steps"
 )
-parser.add_argument("--beta", type=float, default=0.1, help="")
+parser.add_argument("--beta", type=float, default=1.0, help="")
 
 # ---------------
 parser.add_argument("--epochs", type=int, default=5, help="iterations")  # 5

@@ -104,9 +104,12 @@ def evaluateNLI(model, data, device):
         matrix = [[0 for _ in range(3)] for _ in range(3)]
         for j, batch in enumerate(data):
             batch["label"] = batch["label"].to(device)
+            print('batch[label]\n', batch["label"])
             output = model.forward("sc", batch)
+            print('output\n', output)
             loss, logits = output[0].mean(), output[1]
             prediction = torch.argmax(logits, dim=1)
+            print('prediction\n', prediction)
             correct += torch.sum(prediction == batch["label"]).item()
             for k in range(batch["label"].shape[0]):
                 matrix[batch["label"][k]][prediction[k]] += 1

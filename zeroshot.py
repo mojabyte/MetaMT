@@ -93,13 +93,13 @@ def load_data(task_lang):
         test_corpus = CorpusSC(*get_loc("test", task_lang, args.data_dir))
         batch_size = args.sc_batch_size
     elif task == "tc":
-        test_corpus = CorpusTC(*get_loc("test", task_lang, args.data_dir))
+        test_corpus = CorpusTC(get_loc("test", task_lang, args.data_dir)[0])
         batch_size = args.tc_batch_size
     elif task == "po":
-        test_corpus = CorpusPO(*get_loc("test", task_lang, args.data_dir))
+        test_corpus = CorpusPO(get_loc("test", task_lang, args.data_dir)[0])
         batch_size = args.po_batch_size
     elif task == "pa":
-        test_corpus = CorpusPA(*get_loc("test", task_lang, args.data_dir))
+        test_corpus = CorpusPA(get_loc("test", task_lang, args.data_dir)[0])
         batch_size = args.pa_batch_size
 
     return test_corpus, batch_size

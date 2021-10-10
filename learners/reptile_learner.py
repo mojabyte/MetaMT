@@ -48,10 +48,18 @@ def reptile_learner(model, queue, optimizer, device, args):
             param.data = old_vars[idx].data.clone()
 
     update_param_time = time.time()
+    for param in running_vars:
+        param.data /= queue_length
+
+    # for idx, param in enumerate(model.parameters()):
+    #     param.data = old_vars[idx].data + args.beta * (
+    #         running_vars[idx].data - old_vars[idx].data
+    #     )
+
     for idx, param in enumerate(model.parameters()):
-        param.data = old_vars[idx].data + args.beta * (
-            running_vars[idx].data / queue_length - old_vars[idx].data
-        )
+        param.data = (1 - args.beta) * old_vars[idx].data + args.beta * running_vars[
+            idx
+        ].data
     print("update_param_time:", time.time() - update_param_time)
     return losses / (queue_length * args.update_step)
 

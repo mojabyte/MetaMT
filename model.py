@@ -19,7 +19,7 @@ class BertMetaLearning(nn.Module):
         # self.bert = BertModel.from_pretrained('saved/multi_cased_L-12_H-768_A-12_pytorch/', local_files_only=True)
         self.model = AutoModel.from_pretrained(MODEL_NAME)
         self.clf_model = AutoModelForSequenceClassification.from_pretrained(
-            MODEL_NAME, num_labels=args.tc_labels
+            MODEL_NAME, num_labels=args.sc_labels
         )
 
         # Question Answering

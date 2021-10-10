@@ -21,10 +21,22 @@ class CorpusQA(Dataset):
         self.max_query_len = 64
         self.max_seq_len = 384
 
-        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, do_lower_case=False)
-        self.xlmRobertaTokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_NAME)
+        self.tokenizer = XLMRobertaTokenizer.from_pretrained(MODEL_NAME)
 
         self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
+
+        self.data = {
+            key: self.dataset[:][i]
+            for i, key in enumerate(
+                [
+                    "input_ids",
+                    "attention_mask",
+                    "token_type_ids",
+                    "answer_start",
+                    "answer_end",
+                ]
+            )
+        }
 
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
@@ -50,7 +62,7 @@ class CorpusQA(Dataset):
 
             features, dataset = squad_convert_examples_to_features(
                 examples=examples,
-                tokenizer=self.xlmRobertaTokenizer,
+                tokenizer=self.tokenizer,
                 max_seq_length=self.max_seq_len,
                 doc_stride=self.doc_stride,
                 max_query_length=self.max_query_len,

@@ -9,15 +9,17 @@ def reptile_learner(model, queue, optimizer, device, args):
     model.train()
 
     old_vars = [param.data.clone() for param in model.parameters()]
-    running_vars = [
-        torch.zeros(param.shape, device=device) for param in model.parameters()
-    ]
+    # running_vars = [
+    #     torch.zeros(param.shape, device=device) for param in model.parameters()
+    # ]
 
     queue_length = len(queue)
     losses = 0
 
-    for i in range(queue_length):
-        for k in range(args.update_step):
+    update_param_time = time.time()
+
+    for k in range(args.update_step):
+        for i in range(queue_length):
             optimizer.zero_grad()
 
             support_data = queue[i]["batch"][k]["support"]
@@ -43,17 +45,19 @@ def reptile_learner(model, queue, optimizer, device, args):
             #     optimizer.step()
             optimizer.step()
 
-        for idx, param in enumerate(model.parameters()):
-            running_vars[idx].data += param.data.clone()
-            param.data = old_vars[idx].data.clone()
+        # for idx, param in enumerate(model.parameters()):
+        #     running_vars[idx].data += param.data.clone()
+        #     param.data = old_vars[idx].data.clone()
 
-    update_param_time = time.time()
-    for param in running_vars:
-        param.data /= queue_length
+    # for param in running_vars:
+    #     param.data /= queue_length
+
+    # for idx, param in enumerate(model.parameters()):
+    #     param.data += args.beta * running_vars[idx].data
+    #     param.data -= args.beta * old_vars[idx].data
 
     for idx, param in enumerate(model.parameters()):
-        param.data += args.beta * running_vars[idx].data
-        param.data -= args.beta * old_vars[idx].data
+        param.data = (1 - args.beta) * old_vars[idx].data + args.beta * param.data
 
     print("update_param_time:", time.time() - update_param_time)
     return losses / (queue_length * args.update_step)

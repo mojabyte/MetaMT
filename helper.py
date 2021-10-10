@@ -4,6 +4,7 @@ from multiprocessing import Pool, cpu_count
 
 import numpy as np
 from tqdm import tqdm
+from transformers.file_utils import is_tf_available, is_torch_available
 
 import torch
 from torch.utils.data import TensorDataset

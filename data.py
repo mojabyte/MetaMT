@@ -18,14 +18,6 @@ MODEL_NAME = "xlm-roberta-base"
 
 class CorpusQA(Dataset):
     def __init__(self, path, evaluate):
-        self.cls_token = "[CLS]"
-        self.sep_token = "[SEP]"
-        self.pad_token = 0
-        self.sequence_a_segment_id = 0
-        self.sequence_b_segment_id = 1
-        self.pad_token_segment_id = 0
-        self.cls_token_segment_id = 0
-        self.mask_padding_with_zero = True
         self.doc_stride = 128
         self.max_query_len = 64
         self.max_seq_len = 384
@@ -35,10 +27,9 @@ class CorpusQA(Dataset):
         self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
 
     def preprocess(self, file, evaluate=False):
-
-        fname = file.split("/")[-1]
+        filename = file.split("/")[-1]
         cached_features_file = os.path.join(
-            "/".join(file.split("/")[:-1]), "cached_{}".format(fname)
+            "/".join(file.split("/")[:-1]), "cached_{}".format(filename)
         )
 
         # Init features and dataset from cache if it exists
@@ -50,7 +41,6 @@ class CorpusQA(Dataset):
                 features_and_dataset["examples"],
             )
         else:
-
             processor = SquadProcessor()
             if evaluate:
                 examples = processor.get_dev_examples(file)
@@ -145,31 +135,6 @@ class CorpusSC(Dataset):
             token_type_ids = ids["token_type_ids"]
 
             labels = torch.tensor([self.label_dict[label] for label in label_list])
-
-            # with open(path, encoding="utf-8") as f:
-            #     reader = csv.reader(f, delimiter="\t")
-            #     for line in reader:
-            #         try:
-            #             label = line[2]
-            #         except:
-            #             print(line)
-            #         sentence1_tokenized = self.tokenizer.tokenize(line[0])
-            #         sentence2_tokenized = self.tokenizer.tokenize(line[1])
-
-            #         if (
-            #             len(sentence1_tokenized) + len(sentence2_tokenized) + 3
-            #             > self.max_sequence_length
-            #         ):
-            #             continue
-
-            #         input_ids, token_type_ids, attention_mask = self.encode(
-            #             sentence1_tokenized, sentence2_tokenized
-            #         )
-
-            #         list_label.append(self.label_dict[label])
-            #         list_input_ids.append(torch.unsqueeze(input_ids, dim=0))
-            #         list_token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
-            #         list_attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
         else:
             with open(path, encoding="utf-8") as f:
                 data = [json.loads(jline) for jline in f.readlines()]
@@ -195,10 +160,10 @@ class CorpusSC(Dataset):
                     token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
                     attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
 
-        # list_label = torch.tensor(list_label)
-        # list_input_ids = torch.cat(list_input_ids, dim=0)
-        # list_token_type_ids = torch.cat(list_token_type_ids, dim=0)
-        # list_attention_mask = torch.cat(list_attention_mask, dim=0)
+            labels = torch.tensor(labels)
+            input_ids = torch.cat(input_ids, dim=0)
+            token_type_ids = torch.cat(token_type_ids, dim=0)
+            attention_mask = torch.cat(attention_mask, dim=0)
 
         dataset = {
             "input_ids": input_ids,

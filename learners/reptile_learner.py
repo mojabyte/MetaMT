@@ -5,8 +5,10 @@ import time
 # import torch_xla.core.xla_model as xm
 
 
-def reptile_learner(model, queue, optimizer, device, args):
+def reptile_learner(model, queue, optimizer, iteration, args):
     model.train()
+
+    update_time = time.time()
 
     old_vars = [param.data.clone() for param in model.parameters()]
     # running_vars = [
@@ -15,8 +17,6 @@ def reptile_learner(model, queue, optimizer, device, args):
 
     queue_length = len(queue)
     losses = 0
-
-    update_param_time = time.time()
 
     for k in range(args.update_step):
         for i in range(queue_length):
@@ -55,11 +55,12 @@ def reptile_learner(model, queue, optimizer, device, args):
     # for idx, param in enumerate(model.parameters()):
     #     param.data += args.beta * running_vars[idx].data
     #     param.data -= args.beta * old_vars[idx].data
-
+    beta = args.beta * (1 - iteration / args.meta_iteration)
     for idx, param in enumerate(model.parameters()):
-        param.data = (1 - args.beta) * old_vars[idx].data + args.beta * param.data
+        param.data = (1 - beta) * old_vars[idx].data + beta * param.data
 
-    print("update_param_time:", time.time() - update_param_time)
+    print("update_time:", time.time() - update_time)
+
     return losses / (queue_length * args.update_step)
 
 

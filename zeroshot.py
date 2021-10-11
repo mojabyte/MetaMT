@@ -51,7 +51,6 @@ parser.add_argument("--data_dir", type=str, default="data/", help="directory of 
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
-parser.add_argument("--model_name", type=str, default="model.pt", help="")
 parser.add_argument("--grad_clip", type=float, default=1.0)
 
 parser.add_argument("--task", type=str, default="qa_hi")

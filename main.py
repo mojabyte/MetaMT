@@ -27,6 +27,13 @@ parser.add_argument("--meta_lr", type=float, default=2e-5, help="meta learning r
 parser.add_argument("--dropout", type=float, default=0.1, help="")
 parser.add_argument("--hidden_dims", type=int, default=768, help="")  # 768
 
+parser.add_argument(
+    "--model_name",
+    type=str,
+    default="xlm-roberta-base",
+    help="name of the pretrained model",
+)
+
 parser.add_argument("--sc_labels", type=int, default=3, help="")
 parser.add_argument("--qa_labels", type=int, default=2, help="")
 parser.add_argument("--tc_labels", type=int, default=10, help="")
@@ -178,24 +185,44 @@ def main():
         batch_size = 32
 
         if "qa" in k:
-            train_corpus = CorpusQA(*get_loc("train", k, args.data_dir))
-            dev_corpus = CorpusQA(*get_loc("dev", k, args.data_dir))
+            train_corpus = CorpusQA(
+                *get_loc("train", k, args.data_dir), model_name=args.model_name
+            )
+            dev_corpus = CorpusQA(
+                *get_loc("dev", k, args.data_dir), model_name=args.model_name
+            )
             batch_size = args.qa_batch_size
         elif "sc" in k:
-            train_corpus = CorpusSC(*get_loc("train", k, args.data_dir))
-            dev_corpus = CorpusSC(*get_loc("dev", k, args.data_dir))
+            train_corpus = CorpusSC(
+                *get_loc("train", k, args.data_dir), model_name=args.model_name
+            )
+            dev_corpus = CorpusSC(
+                *get_loc("dev", k, args.data_dir), model_name=args.model_name
+            )
             batch_size = args.sc_batch_size
         elif "tc" in k:
-            train_corpus = CorpusTC(get_loc("train", k, args.data_dir)[0])
-            dev_corpus = CorpusTC(get_loc("dev", k, args.data_dir)[0])
+            train_corpus = CorpusTC(
+                get_loc("train", k, args.data_dir)[0], model_name=args.model_name
+            )
+            dev_corpus = CorpusTC(
+                get_loc("dev", k, args.data_dir)[0], model_name=args.model_name
+            )
             batch_size = args.tc_batch_size
         elif "po" in k:
-            train_corpus = CorpusPO(get_loc("train", k, args.data_dir)[0])
-            dev_corpus = CorpusPO(get_loc("dev", k, args.data_dir)[0])
+            train_corpus = CorpusPO(
+                get_loc("train", k, args.data_dir)[0], model_name=args.model_name
+            )
+            dev_corpus = CorpusPO(
+                get_loc("dev", k, args.data_dir)[0], model_name=args.model_name
+            )
             batch_size = args.po_batch_size
         elif "pa" in k:
-            train_corpus = CorpusPA(get_loc("train", k, args.data_dir)[0])
-            dev_corpus = CorpusPA(get_loc("dev", k, args.data_dir)[0])
+            train_corpus = CorpusPA(
+                get_loc("train", k, args.data_dir)[0], model_name=args.model_name
+            )
+            dev_corpus = CorpusPA(
+                get_loc("dev", k, args.data_dir)[0], model_name=args.model_name
+            )
             batch_size = args.pa_batch_size
         else:
             continue

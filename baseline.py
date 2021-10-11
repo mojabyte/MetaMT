@@ -26,6 +26,13 @@ parser.add_argument("--lr", type=float, default=3e-5, help="learning rate")
 parser.add_argument("--dropout", type=float, default=0.1, help="")
 parser.add_argument("--hidden_dims", type=int, default=768, help="")
 
+parser.add_argument(
+    "--model_name",
+    type=str,
+    default="xlm-roberta-base",
+    help="name of the pretrained model",
+)
+
 parser.add_argument("--sc_labels", type=int, default=3, help="")
 parser.add_argument("--qa_labels", type=int, default=2, help="")
 parser.add_argument("--tc_labels", type=int, default=10, help="")
@@ -96,29 +103,59 @@ DEVICE = torch.device("cuda" if args.cuda else "cpu")
 def load_data(task_lang):
     task = task_lang.split("_")[0]
     if task == "qa":
-        train_corpus = CorpusQA(*get_loc("train", task_lang, args.data_dir))
-        dev_corpus = CorpusQA(*get_loc("dev", task_lang, args.data_dir))
-        test_corpus = CorpusQA(*get_loc("test", task_lang, args.data_dir))
+        train_corpus = CorpusQA(
+            *get_loc("train", task_lang, args.data_dir), model_name=args.model_name
+        )
+        dev_corpus = CorpusQA(
+            *get_loc("dev", task_lang, args.data_dir), model_name=args.model_name
+        )
+        test_corpus = CorpusQA(
+            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+        )
         batch_size = args.qa_batch_size
     elif task == "sc":
-        train_corpus = CorpusSC(*get_loc("train", task_lang, args.data_dir))
-        dev_corpus = CorpusSC(*get_loc("dev", task_lang, args.data_dir))
-        test_corpus = CorpusSC(*get_loc("test", task_lang, args.data_dir))
+        train_corpus = CorpusSC(
+            *get_loc("train", task_lang, args.data_dir), model_name=args.model_name
+        )
+        dev_corpus = CorpusSC(
+            *get_loc("dev", task_lang, args.data_dir), model_name=args.model_name
+        )
+        test_corpus = CorpusSC(
+            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+        )
         batch_size = args.sc_batch_size
     elif task == "tc":
-        train_corpus = CorpusTC(get_loc("train", task_lang, args.data_dir)[0])
-        dev_corpus = CorpusTC(get_loc("dev", task_lang, args.data_dir)[0])
-        test_corpus = CorpusTC(get_loc("test", task_lang, args.data_dir)[0])
+        train_corpus = CorpusTC(
+            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        dev_corpus = CorpusTC(
+            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        test_corpus = CorpusTC(
+            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
         batch_size = args.tc_batch_size
     elif task == "po":
-        train_corpus = CorpusPO(get_loc("train", task_lang, args.data_dir)[0])
-        dev_corpus = CorpusPO(get_loc("dev", task_lang, args.data_dir)[0])
-        test_corpus = CorpusPO(get_loc("test", task_lang, args.data_dir)[0])
+        train_corpus = CorpusPO(
+            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        dev_corpus = CorpusPO(
+            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        test_corpus = CorpusPO(
+            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
         batch_size = args.po_batch_size
     elif task == "pa":
-        train_corpus = CorpusPA(get_loc("train", task_lang, args.data_dir)[0])
-        dev_corpus = CorpusPA(get_loc("dev", task_lang, args.data_dir)[0])
-        test_corpus = CorpusPA(get_loc("test", task_lang, args.data_dir)[0])
+        train_corpus = CorpusPA(
+            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        dev_corpus = CorpusPA(
+            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
+        test_corpus = CorpusPA(
+            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+        )
         batch_size = args.pa_batch_size
 
     return train_corpus, dev_corpus, test_corpus, batch_size

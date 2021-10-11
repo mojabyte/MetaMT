@@ -114,7 +114,7 @@ class CorpusSC(Dataset):
 
         self.label_dict = {"contradiction": 0, "entailment": 1, "neutral": 2}
 
-        cached_data_file = os.path.join(path, f"_{model_name}.pickle")
+        cached_data_file = path + f"_{model_name}.pickle"
 
         if os.path.exists(cached_data_file):
             self.data = pickle.load(open(cached_data_file, "rb"))
@@ -277,7 +277,7 @@ class CorpusPO(Dataset):
             "BLK",
         ]
 
-        cached_data_file = os.path.join(path, f"_{model_name}.pickle")
+        cached_data_file = path + f"_{model_name}.pickle"
 
         if os.path.exists(cached_data_file):
             self.data = pickle.load(open(cached_data_file, "rb"))
@@ -428,7 +428,7 @@ class CorpusTC(Dataset):
             "BLK",
         ]
 
-        cached_data_file = os.path.join(path, f"_{model_name}.pickle")
+        cached_data_file = path + f"_{model_name}.pickle"
 
         if os.path.exists(cached_data_file):
             self.data = pickle.load(open(cached_data_file, "rb"))
@@ -573,7 +573,7 @@ class CorpusPA(Dataset):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
 
-        cached_data_file = os.path.join(path, f"_{model_name}.pickle")
+        cached_data_file = path + f"_{model_name}.pickle"
 
         if os.path.exists(cached_data_file):
             self.data = pickle.load(open(cached_data_file, "rb"))

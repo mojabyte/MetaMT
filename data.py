@@ -20,6 +20,8 @@ class CorpusQA(Dataset):
         self.max_query_len = 64
         self.max_seq_len = 384
 
+        self.model_name = model_name
+
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, do_lower_case=False, use_fast=False
         )
@@ -44,7 +46,9 @@ class CorpusQA(Dataset):
         filename = file[-1]
         data_dir = "/".join(file[:-1])
 
-        cached_features_file = os.path.join(data_dir, "cached_{}".format(filename))
+        cached_features_file = os.path.join(
+            data_dir, "cached_{}_{}".format(self.model_name, filename)
+        )
 
         # Init features and dataset from cache if it exists
         if os.path.exists(cached_features_file):
@@ -110,11 +114,13 @@ class CorpusSC(Dataset):
 
         self.label_dict = {"contradiction": 0, "entailment": 1, "neutral": 2}
 
-        if os.path.exists(path + ".pickle"):
-            self.data = pickle.load(open(path + ".pickle", "rb"))
+        cached_data_file = os.path.join(path, f"_{self.model_name}.pickle")
+
+        if os.path.exists(cached_data_file):
+            self.data = pickle.load(open(cached_data_file, "rb"))
         else:
             self.data = self.preprocess(path, file)
-            with open(path + ".pickle", "wb") as f:
+            with open(cached_data_file, "wb") as f:
                 pickle.dump(self.data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def preprocess(self, path, file):
@@ -271,11 +277,13 @@ class CorpusPO(Dataset):
             "BLK",
         ]
 
-        if os.path.exists(path + ".pickle"):
-            self.data = pickle.load(open(path + ".pickle", "rb"))
+        cached_data_file = os.path.join(path, f"_{self.model_name}.pickle")
+
+        if os.path.exists(cached_data_file):
+            self.data = pickle.load(open(cached_data_file, "rb"))
         else:
             self.data = self.preprocess(path)
-            with open(path + ".pickle", "wb") as f:
+            with open(cached_data_file, "wb") as f:
                 pickle.dump(self.data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def preprocess(self, file):
@@ -420,11 +428,13 @@ class CorpusTC(Dataset):
             "BLK",
         ]
 
-        if os.path.exists(path + ".pickle"):
-            self.data = pickle.load(open(path + ".pickle", "rb"))
+        cached_data_file = os.path.join(path, f"_{self.model_name}.pickle")
+
+        if os.path.exists(cached_data_file):
+            self.data = pickle.load(open(cached_data_file, "rb"))
         else:
             self.data = self.preprocess(path)
-            with open(path + ".pickle", "wb") as f:
+            with open(cached_data_file, "wb") as f:
                 pickle.dump(self.data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def preprocess(self, file):
@@ -563,11 +573,13 @@ class CorpusPA(Dataset):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
 
-        if os.path.exists(path + ".pickle"):
-            self.data = pickle.load(open(path + ".pickle", "rb"))
+        cached_data_file = os.path.join(path, f"_{self.model_name}.pickle")
+
+        if os.path.exists(cached_data_file):
+            self.data = pickle.load(open(cached_data_file, "rb"))
         else:
             self.data = self.preprocess(path)
-            with open(path + ".pickle", "wb") as f:
+            with open(cached_data_file, "wb") as f:
                 pickle.dump(self.data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def preprocess(self, path):

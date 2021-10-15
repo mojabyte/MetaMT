@@ -32,6 +32,9 @@ parser.add_argument(
     default="xlm-roberta-base",
     help="name of the pretrained model",
 )
+parser.add_argument(
+    "--local_model", action="store_true", help="use local pretrained model"
+)
 
 parser.add_argument("--sc_labels", type=int, default=3, help="")
 parser.add_argument("--qa_labels", type=int, default=2, help="")
@@ -104,57 +107,87 @@ def load_data(task_lang):
     task = task_lang.split("_")[0]
     if task == "qa":
         train_corpus = CorpusQA(
-            *get_loc("train", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("train", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         dev_corpus = CorpusQA(
-            *get_loc("dev", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("dev", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         test_corpus = CorpusQA(
-            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("test", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         batch_size = args.qa_batch_size
     elif task == "sc":
         train_corpus = CorpusSC(
-            *get_loc("train", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("train", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         dev_corpus = CorpusSC(
-            *get_loc("dev", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("dev", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         test_corpus = CorpusSC(
-            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("test", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         batch_size = args.sc_batch_size
     elif task == "tc":
         train_corpus = CorpusTC(
-            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("train", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         dev_corpus = CorpusTC(
-            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("dev", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         test_corpus = CorpusTC(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.tc_batch_size
     elif task == "po":
         train_corpus = CorpusPO(
-            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("train", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         dev_corpus = CorpusPO(
-            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("dev", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         test_corpus = CorpusPO(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.po_batch_size
     elif task == "pa":
         train_corpus = CorpusPA(
-            get_loc("train", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("train", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         dev_corpus = CorpusPA(
-            get_loc("dev", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("dev", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         test_corpus = CorpusPA(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.pa_batch_size
 

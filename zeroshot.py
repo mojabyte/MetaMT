@@ -27,6 +27,9 @@ parser.add_argument(
     default="xlm-roberta-base",
     help="name of the pretrained model",
 )
+parser.add_argument(
+    "--local_model", action="store_true", help="use local pretrained model"
+)
 
 parser.add_argument("--sc_labels", type=int, default=3, help="")
 parser.add_argument("--qa_labels", type=int, default=2, help="")
@@ -94,27 +97,37 @@ def load_data(task_lang):
     [task, lang] = task_lang.split("_")
     if task == "qa":
         test_corpus = CorpusQA(
-            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("test", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         batch_size = args.qa_batch_size
     elif task == "sc":
         test_corpus = CorpusSC(
-            *get_loc("test", task_lang, args.data_dir), model_name=args.model_name
+            *get_loc("test", task_lang, args.data_dir),
+            model_name=args.model_name,
+            local_files_only=args.local_model
         )
         batch_size = args.sc_batch_size
     elif task == "tc":
         test_corpus = CorpusTC(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.tc_batch_size
     elif task == "po":
         test_corpus = CorpusPO(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.po_batch_size
     elif task == "pa":
         test_corpus = CorpusPA(
-            get_loc("test", task_lang, args.data_dir)[0], model_name=args.model_name
+            get_loc("test", task_lang, args.data_dir)[0],
+            model_name=args.model_name,
+            local_files_only=args.local_model,
         )
         batch_size = args.pa_batch_size
 

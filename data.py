@@ -11,7 +11,9 @@ from torch.utils.data import Dataset
 
 
 class CorpusQA(Dataset):
-    def __init__(self, path, evaluate, model_name="xlm-roberta-base"):
+    def __init__(
+        self, path, evaluate, model_name="xlm-roberta-base", local_files_only=False
+    ):
         self.doc_stride = 128
         self.max_query_len = 64
         self.max_seq_len = 384
@@ -19,7 +21,10 @@ class CorpusQA(Dataset):
         self.model_name = model_name
 
         self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, do_lower_case=False, use_fast=False
+            model_name,
+            do_lower_case=False,
+            use_fast=False,
+            local_files_only=local_files_only,
         )
 
         self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
@@ -93,7 +98,9 @@ class CorpusQA(Dataset):
 
 
 class CorpusSC(Dataset):
-    def __init__(self, path, file, model_name="xlm-roberta-base"):
+    def __init__(
+        self, path, file, model_name="xlm-roberta-base", local_files_only=False
+    ):
         self.max_sequence_length = 128
         self.cls_token = "[CLS]"
         self.sep_token = "[SEP]"
@@ -106,7 +113,9 @@ class CorpusSC(Dataset):
         self.doc_stride = 128
         self.max_query_length = 64
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, do_lower_case=False, local_files_only=local_files_only
+        )
 
         self.label_dict = {"contradiction": 0, "entailment": 1, "neutral": 2}
 
@@ -244,14 +253,16 @@ class CorpusSC(Dataset):
 
 
 class CorpusPO(Dataset):
-    def __init__(self, path, model_name="xlm-roberta-base"):
+    def __init__(self, path, model_name="xlm-roberta-base", local_files_only=False):
         self.max_sequence_length = 128
         self.cls_token = "[CLS]"
         self.sep_token = "[SEP]"
         self.pad_token = 0
         self.mask_padding_with_zero = True
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, do_lower_case=False, local_files_only=local_files_only
+        )
         self.labels_list = [
             "ADJ",
             "ADP",
@@ -403,14 +414,16 @@ class CorpusPO(Dataset):
 
 
 class CorpusTC(Dataset):
-    def __init__(self, path, model_name="xlm-roberta-base"):
+    def __init__(self, path, model_name="xlm-roberta-base", local_files_only=False):
         self.max_sequence_length = 128
         self.cls_token = "[CLS]"
         self.sep_token = "[SEP]"
         self.pad_token = 0
         self.mask_padding_with_zero = True
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, do_lower_case=False, local_files_only=local_files_only
+        )
         self.labels_list = [
             "O",
             "B-PER",
@@ -554,7 +567,7 @@ class CorpusTC(Dataset):
 
 
 class CorpusPA(Dataset):
-    def __init__(self, path, model_name="xlm-roberta-base"):
+    def __init__(self, path, model_name="xlm-roberta-base", local_files_only=False):
         self.max_sequence_length = 128
         self.cls_token = "[CLS]"
         self.sep_token = "[SEP]"
@@ -567,7 +580,9 @@ class CorpusPA(Dataset):
         self.doc_stride = 128
         self.max_query_length = 64
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=False)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, do_lower_case=False, local_files_only=local_files_only
+        )
 
         cached_data_file = path + f"_{model_name}.pickle"
 

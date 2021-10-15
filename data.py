@@ -48,7 +48,7 @@ class CorpusQA(Dataset):
         data_dir = "/".join(file[:-1])
 
         cached_features_file = os.path.join(
-            data_dir, "cached_{}_{}".format(self.model_name, filename)
+            data_dir, "cached_{}_{}".format(type(self.tokenizer).__name__, filename)
         )
 
         # Init features and dataset from cache if it exists
@@ -119,7 +119,7 @@ class CorpusSC(Dataset):
 
         self.label_dict = {"contradiction": 0, "entailment": 1, "neutral": 2}
 
-        cached_data_file = path + f"_{model_name}.pickle"
+        cached_data_file = path + f"_{type(self.tokenizer).__name__}.pickle"
 
         if os.path.exists(cached_data_file):
             self.data = pickle.load(open(cached_data_file, "rb"))

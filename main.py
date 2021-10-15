@@ -27,6 +27,8 @@ parser.add_argument("--meta_lr", type=float, default=2e-5, help="meta learning r
 parser.add_argument("--dropout", type=float, default=0.1, help="")
 parser.add_argument("--hidden_dims", type=int, default=768, help="")  # 768
 
+# bert-base-multilingual-cased
+# xlm-roberta-base
 parser.add_argument(
     "--model_name",
     type=str,

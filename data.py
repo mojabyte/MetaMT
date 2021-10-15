@@ -10,10 +10,6 @@ import pickle5 as pickle
 from torch.utils.data import Dataset
 
 
-# bert-base-multilingual-cased
-# xlm-roberta-base
-
-
 class CorpusQA(Dataset):
     def __init__(self, path, evaluate, model_name="xlm-roberta-base"):
         self.doc_stride = 128

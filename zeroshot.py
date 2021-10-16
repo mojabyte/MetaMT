@@ -3,10 +3,10 @@ import os, json, argparse, torch, logging, warnings, sys
 import numpy as np
 from torch.utils.data import DataLoader
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
-from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
+from utils.utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
+from utils.logger import Logger
 from model import BertMetaLearning
 from datapath import get_loc
-from utils.logger import Logger
 
 from transformers import (
     AdamW,

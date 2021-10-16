@@ -4,7 +4,7 @@ import numpy as np
 import logging
 from torch.utils.data import DataLoader
 from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
-from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
+from utils.utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 import os
 
 # import pickle,json

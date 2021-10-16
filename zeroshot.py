@@ -1,4 +1,4 @@
-import os, json, argparse, torch, logging, warnings
+import os, json, argparse, torch, logging, warnings, sys
 
 import numpy as np
 from torch.utils.data import DataLoader
@@ -6,6 +6,7 @@ from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
 from utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
 from model import BertMetaLearning
 from datapath import get_loc
+from utils.logger import Logger
 
 from transformers import (
     AdamW,
@@ -54,6 +55,7 @@ parser.add_argument("--data_dir", type=str, default="data/", help="directory of 
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
+parser.add_argument("--log_file", type=str, default="zeroshot_output.txt", help="")
 parser.add_argument("--grad_clip", type=float, default=1.0)
 
 parser.add_argument("--task", type=str, default="qa_hi")
@@ -69,7 +71,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-print(args)
 
 logger = {"args": vars(args)}
 logger["train_loss"] = []
@@ -82,6 +83,9 @@ np.random.seed(args.seed)
 
 if not os.path.exists(args.save):
     os.makedirs(args.save)
+
+sys.stdout = Logger(os.path.join(args.save, args.log_file))
+print(args)
 
 if torch.cuda.is_available():
     if not args.cuda:

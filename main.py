@@ -12,6 +12,7 @@ from datapath import loc, get_loc
 
 from sampler import TaskSampler
 from learners.reptile_learner import reptile_learner
+from utils.logger import Logger
 
 from transformers import (
     AdamW,
@@ -83,6 +84,7 @@ parser.add_argument("--cuda", action="store_true", help="use CUDA")
 parser.add_argument("--tpu", action="store_true", help="use TPU")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
+parser.add_argument("--log_file", type=str, default="main_output.txt", help="")
 parser.add_argument("--grad_clip", type=float, default=5.0)
 parser.add_argument("--meta_tasks", type=str, default="sc,pa,qa,tc,po")
 
@@ -113,21 +115,7 @@ np.random.seed(args.seed)
 if not os.path.exists(args.save):
     os.makedirs(args.save)
 
-
-class Logger(object):
-    def __init__(self):
-        self.terminal = sys.stdout
-        self.log = open(os.path.join(args.save, "output.txt"), "w")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        self.log.flush()
-
-
-sys.stdout = Logger()
+sys.stdout = Logger(os.path.join(args.save, args.log_file))
 print(args)
 
 task_types = args.meta_tasks.split(",")

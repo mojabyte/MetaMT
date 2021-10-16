@@ -1,4 +1,4 @@
-import os, sys
+import sys
 
 
 class Logger(object):

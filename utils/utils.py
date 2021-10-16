@@ -1,10 +1,10 @@
 import os
 import torch
-from squad_metrics import (
-    compute_predictions_logits,
-    squad_evaluate,
-)
 from torch.utils.data import DataLoader, SequentialSampler
+from transformers.data.metrics.squad_metrics import (
+    squad_evaluate,
+    compute_predictions_logits,
+)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

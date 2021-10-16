@@ -62,7 +62,7 @@ parser.add_argument("--cuda", action="store_true", help="use CUDA")
 parser.add_argument("--tpu", action="store_true", help="use TPU")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
-parser.add_argument("--model_name", type=str, default="model.pt", help="")
+parser.add_argument("--model_filename", type=str, default="model.pt", help="")
 parser.add_argument("--grad_clip", type=float, default=1.0)
 
 parser.add_argument("--task", type=str, default="qa_hi")
@@ -378,8 +378,8 @@ def main():
                 logger["val_metric"].append(val_acc)
 
             if val_loss < min_task_loss:
-                print(os.path.join(args.save, args.model_name))
-                torch.save(model, os.path.join(args.save, args.model_name))
+                print(os.path.join(args.save, args.model_filename))
+                torch.save(model, os.path.join(args.save, args.model_filename))
                 min_task_loss = val_loss
                 if (
                     "sc" in args.task

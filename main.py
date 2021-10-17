@@ -93,6 +93,7 @@ parser.add_argument(
 )
 parser.add_argument("--temp", type=float, default=1.0)
 
+parser.add_argument("--num_workers", type=int, default=0, help="")
 parser.add_argument("--n_best_size", default=20, type=int)  # 20
 parser.add_argument("--max_answer_length", default=30, type=int)  # 30
 parser.add_argument(
@@ -252,7 +253,7 @@ def main():
         train_loader = DataLoader(
             train_corpus,
             batch_sampler=train_sampler,
-            num_workers=1,
+            num_workers=args.num_workers,
             pin_memory=True,
             collate_fn=train_sampler.episodic_collate_fn,
         )

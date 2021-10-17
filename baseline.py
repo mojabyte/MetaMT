@@ -293,8 +293,11 @@ def test():
             json.dump(result, outfile)
         test_loss = -result["f1"]
     elif "sc" in args.task:
-        test_loss, test_acc = evaluateNLI(model, test_dataloader, DEVICE)
+        test_loss, test_acc, matrix = evaluateNLI(
+            model, test_dataloader, DEVICE, return_matrix=True
+        )
         print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))
+        print("confusion matrix:\n", matrix)
     elif "tc" in args.task:
         test_loss, test_acc = evaluateNER(model, test_dataloader, DEVICE)
         print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))

@@ -96,7 +96,7 @@ def evaluateQA(model, corpus, task, path):
     return results
 
 
-def evaluateNLI(model, data, device):
+def evaluateNLI(model, data, device, return_matrix=False):
     with torch.no_grad():
         total_loss = 0.0
         correct = 0.0
@@ -114,8 +114,11 @@ def evaluateNLI(model, data, device):
             total_loss += loss.item()
 
         total_loss /= len(data)
+        total_acc = correct / total
 
-        return total_loss, correct / total  # , matrix
+        if return_matrix:
+            return total_loss, total_acc, matrix
+        return total_loss, total_acc
 
 
 def evaluatePA(model, data, device):

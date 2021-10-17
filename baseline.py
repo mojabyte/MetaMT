@@ -399,8 +399,8 @@ def main():
         with open(os.path.join(args.save, "log.pickle"), "wb") as g:
             pickle.dump(logger, g)
 
-        print(os.path.join(args.save, 'last_', args.model_filename))
-        torch.save(model, os.path.join(args.save, 'last_', args.model_filename))
+        print(os.path.join(args.save, "last_" + args.model_filename))
+        torch.save(model, os.path.join(args.save, "last_" + args.model_filename))
 
         test()
 

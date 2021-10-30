@@ -44,17 +44,11 @@ class CorpusQA(Dataset):
 
         self.data = {
             "input_ids": self.dataset[:][0],
-            "attention_mask": self.dataset[:][1],
-            "token_type_ids": self.dataset[:][2],
+            "attention_mask": self.dataset[:][1].bool(),
+            "token_type_ids": self.dataset[:][2].bool(),
             "answer_start": self.dataset[:][3],
             "answer_end": self.dataset[:][4],
         }
-
-        print("input_ids: ", self.data["input_ids"][0])
-        print("attention_mask: ", self.data["attention_mask"][0])
-        print("token_type_ids: ", self.data["token_type_ids"][0])
-        print("answer_start: ", self.data["answer_start"][0])
-        print("answer_end: ", self.data["answer_end"][0])
 
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
@@ -171,7 +165,7 @@ class CorpusSC(Dataset):
             )
             input_ids = ids["input_ids"]
             attention_mask = ids["attention_mask"].bool()
-            token_type_ids = ids["token_type_ids"]
+            token_type_ids = ids["token_type_ids"].bool()
 
             labels = torch.tensor(
                 [self.label_dict[label] for label in label_list], dtype=torch.uint8

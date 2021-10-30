@@ -1,4 +1,5 @@
 import argparse, time, torch, os, logging, warnings, sys
+import random
 
 import numpy as np
 from torch.utils.data import DataLoader
@@ -14,10 +15,7 @@ from sampler import TaskSampler
 from learners.reptile_learner import reptile_learner
 from utils.logger import Logger
 
-from transformers import (
-    AdamW,
-    get_linear_schedule_with_warmup,
-)
+from transformers import AdamW
 
 logging.getLogger("transformers.tokenization_utils").setLevel(logging.ERROR)
 warnings.filterwarnings("ignore")
@@ -87,6 +85,7 @@ parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--log_file", type=str, default="main_output.txt", help="")
 parser.add_argument("--grad_clip", type=float, default=5.0)
 parser.add_argument("--meta_tasks", type=str, default="sc,pa,qa,tc,po")
+parser.add_argument("--queue_length", default=8, type=int)
 
 parser.add_argument(
     "--sampler", type=str, default="uniform_batch", choices=["uniform_batch"]
@@ -112,6 +111,7 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 np.random.seed(args.seed)
+random.seed(args.seed)
 
 if not os.path.exists(args.save):
     os.makedirs(args.save)
@@ -312,18 +312,6 @@ def main():
     logger["train_loss"] = []
     logger["args"] = args
 
-    ## = Model Update config.
-    # criterion  = nn.CrossEntropyLoss()
-    # criterion_mt = losses.NTXentLoss(temperature=0.07)
-    #   criterion = CPELoss(args)
-    # criterion = PrototypicalLoss(n_support=args.shot)
-    # optim = SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-    # optim = Adam(model.parameters(),
-    #               lr=args.lr,
-    #               weight_decay=args.wd)
-
-    # scheduler = StepLR(optim, step_size=2, gamma=args.gamma)
-
     ## == 2) Learn model
     global_time = time.time()
 
@@ -354,18 +342,11 @@ def main():
                     for i, task in enumerate(list_of_tasks)
                 ]
 
+                if args.queue_length < len(train_loader_iterations):
+                    queue = random.sample(queue, args.queue_length)
+
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)
-                # loss, prototypes = pt_learner(
-                #     model,
-                #     support_images,
-                #     support_labels,
-                #     query_images,
-                #     query_labels,
-                #     criterion,
-                #     optim,
-                #     args,
-                # )
                 train_loss += loss
 
                 ## == validation ==============
@@ -390,6 +371,14 @@ def main():
                         else:
                             loss_per_task[task[:2]] = val_loss_dict[task]
 
+                    for task in loss_per_task.keys():
+                        if loss_per_task[task] < min_task_losses[task]:
+                            print("Saving " + task + "  Model")
+                            torch.save(
+                                model, os.path.join(args.save, "model_" + task + ".pt"),
+                            )
+                            min_task_losses[task] = loss_per_task[task]
+
                     print(
                         "Time: %f, Step: %d, Train Loss: %f, Val Loss: %f"
                         % (
@@ -399,16 +388,8 @@ def main():
                             val_loss_total,
                         )
                     )
-                    print("===============================================")
                     global_time = time.time()
 
-                    for task in loss_per_task.keys():
-                        if loss_per_task[task] < min_task_losses[task]:
-                            torch.save(
-                                model, os.path.join(args.save, "model_" + task + ".pt"),
-                            )
-                            min_task_losses[task] = loss_per_task[task]
-                            print("Saving " + task + "  Model")
                     total_loss = 0
 
                 if args.scheduler:
@@ -417,9 +398,8 @@ def main():
     except KeyboardInterrupt:
         print("skipping training")
 
-    # save last model
+    print("Saving new last model...")
     torch.save(model, os.path.join(args.save, "model_last.pt"))
-    print("Saving new last model")
 
 
 if __name__ == "__main__":

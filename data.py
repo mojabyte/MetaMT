@@ -50,6 +50,12 @@ class CorpusQA(Dataset):
             "answer_end": self.dataset[:][4],
         }
 
+        print("input_ids: ", self.data["input_ids"][0])
+        print("attention_mask: ", self.data["attention_mask"][0])
+        print("token_type_ids: ", self.data["token_type_ids"][0])
+        print("answer_start: ", self.data["answer_start"][0])
+        print("answer_end: ", self.data["answer_end"][0])
+
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
         filename = file[-1]

@@ -5,7 +5,7 @@ import pickle5 as pickle
 
 import numpy as np
 from torch.utils.data import DataLoader
-from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
+from data import CorpusQA, CorpusSC
 from model import BertMetaLearning
 from itertools import cycle
 import matplotlib.pyplot as plt
@@ -128,15 +128,6 @@ for k in list_of_tasks:
     elif "sc" in k:
         train_corpus[k] = CorpusSC(loc["train"][k][0], loc["train"][k][1])
         dev_corpus[k] = CorpusSC(loc["dev"][k][0], loc["dev"][k][1])
-    elif "tc" in k:
-        train_corpus[k] = CorpusTC(loc["train"][k][0])
-        dev_corpus[k] = CorpusTC(loc["dev"][k][0])
-    elif "po" in k:
-        train_corpus[k] = CorpusPO(loc["train"][k][0])
-        dev_corpus[k] = CorpusPO(loc["dev"][k][0])
-    elif "pa" in k:
-        train_corpus[k] = CorpusPA(loc["train"][k][0])
-        dev_corpus[k] = CorpusPA(loc["dev"][k][0])
 
 train_dataloaders = {}
 dev_dataloaders = {}

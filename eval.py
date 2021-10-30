@@ -3,8 +3,8 @@ import argparse
 import numpy as np
 import logging
 from torch.utils.data import DataLoader
-from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
-from utils.utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
+from data import CorpusQA, CorpusSC
+from utils.utils import evaluateQA, evaluateNLI
 import os
 
 # import pickle,json
@@ -66,12 +66,6 @@ for k in list_of_tasks:
         test_corpus[k] = CorpusQA(loc["test"][k][0], loc["test"][k][1])
     elif "sc" in k:
         test_corpus[k] = CorpusSC(loc["test"][k][0], loc["test"][k][1])
-    elif "tc" in k:
-        test_corpus[k] = CorpusTC(loc["test"][k][0])
-    elif "po" in k:
-        test_corpus[k] = CorpusPO(loc["test"][k][0])
-    elif "pa" in k:
-        test_corpus[k] = CorpusPA(loc["test"][k][0])
 
 test_dataloaders = {}
 
@@ -110,15 +104,6 @@ if args.load.count(".pt") > 0:
         elif "sc" in k:
             test_loss, test_acc = evaluateNLI(model, test_dataloaders[k], DEVICE)
             best_results[k] = max(best_results[k], test_acc)
-        elif "tc" in k:
-            test_loss, test_acc = evaluateNER(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
-        elif "po" in k:
-            test_loss, test_acc = evaluatePOS(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
-        elif "pa" in k:
-            test_loss, test_acc = evaluatePA(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
 
 elif os.path.exists(os.path.join(args.load, "model.pt")):
     model = torch.load(os.path.join(args.load, "model.pt"))
@@ -129,15 +114,6 @@ elif os.path.exists(os.path.join(args.load, "model.pt")):
             best_results[k] = max(best_results[k], result["f1"])
         elif "sc" in k:
             test_loss, test_acc = evaluateNLI(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
-        elif "tc" in k:
-            test_loss, test_acc = evaluateNER(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
-        elif "po" in k:
-            test_loss, test_acc = evaluatePOS(model, test_dataloaders[k], DEVICE)
-            best_results[k] = max(best_results[k], test_acc)
-        elif "pa" in k:
-            test_loss, test_acc = evaluatePA(model, test_dataloaders[k], DEVICE)
             best_results[k] = max(best_results[k], test_acc)
 
 else:
@@ -163,19 +139,6 @@ else:
                     test_loss, test_acc = evaluateNLI(
                         model, test_dataloaders[k], DEVICE
                     )
-                    best_results[k] = max(best_results[k], test_acc)
-                elif "tc" in k and (model_task == "tc" or ("tc" not in model_found)):
-                    test_loss, test_acc = evaluateNER(
-                        model, test_dataloaders[k], DEVICE
-                    )
-                    best_results[k] = max(best_results[k], test_acc)
-                elif "po" in k and (model_task == "po" or ("po" not in model_found)):
-                    test_loss, test_acc = evaluatePOS(
-                        model, test_dataloaders[k], DEVICE
-                    )
-                    best_results[k] = max(best_results[k], test_acc)
-                elif "pa" in k and (model_task == "pa" or ("pa" not in model_found)):
-                    test_loss, test_acc = evaluatePA(model, test_dataloaders[k], DEVICE)
                     best_results[k] = max(best_results[k], test_acc)
             print(saved_model, best_results)
 

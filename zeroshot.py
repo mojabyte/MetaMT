@@ -2,8 +2,8 @@ import os, json, argparse, torch, logging, warnings, sys
 
 import numpy as np
 from torch.utils.data import DataLoader
-from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
-from utils.utils import evaluateQA, evaluateNLI, evaluateNER, evaluatePOS, evaluatePA
+from data import CorpusQA, CorpusSC
+from utils.utils import evaluateQA, evaluateNLI
 from utils.logger import Logger
 from model import BertMetaLearning
 from datapath import get_loc
@@ -113,27 +113,6 @@ def load_data(task_lang):
             local_files_only=args.local_model
         )
         batch_size = args.sc_batch_size
-    elif task == "tc":
-        test_corpus = CorpusTC(
-            get_loc("test", task_lang, args.data_dir)[0],
-            model_name=args.model_name,
-            local_files_only=args.local_model,
-        )
-        batch_size = args.tc_batch_size
-    elif task == "po":
-        test_corpus = CorpusPO(
-            get_loc("test", task_lang, args.data_dir)[0],
-            model_name=args.model_name,
-            local_files_only=args.local_model,
-        )
-        batch_size = args.po_batch_size
-    elif task == "pa":
-        test_corpus = CorpusPA(
-            get_loc("test", task_lang, args.data_dir)[0],
-            model_name=args.model_name,
-            local_files_only=args.local_model,
-        )
-        batch_size = args.pa_batch_size
 
     return test_corpus, batch_size
 
@@ -186,15 +165,6 @@ def test():
         )
         print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))
         print("confusion matrix:\n", matrix)
-    elif "tc" in args.task:
-        test_loss, test_acc = evaluateNER(model, test_dataloader, DEVICE)
-        print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))
-    elif "po" in args.task:
-        test_loss, test_acc = evaluatePOS(model, test_dataloader, DEVICE)
-        print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))
-    elif "pa" in args.task:
-        test_loss, test_acc = evaluatePA(model, test_dataloader, DEVICE)
-        print("test_loss {:10.8f} test_acc {:6.4f}".format(test_loss, test_acc))
     return test_loss
 
 

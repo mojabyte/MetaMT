@@ -4,7 +4,7 @@ import random
 import numpy as np
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR
-from data import CorpusQA, CorpusSC, CorpusTC, CorpusPO, CorpusPA
+from data import CorpusQA, CorpusSC
 from model import BertMetaLearning
 from datapath import loc, get_loc
 
@@ -40,19 +40,13 @@ parser.add_argument(
 
 parser.add_argument("--sc_labels", type=int, default=3, help="")
 parser.add_argument("--qa_labels", type=int, default=2, help="")
-parser.add_argument("--tc_labels", type=int, default=10, help="")
-parser.add_argument("--po_labels", type=int, default=18, help="")
-parser.add_argument("--pa_labels", type=int, default=2, help="")
 
 parser.add_argument("--qa_batch_size", type=int, default=8, help="batch size")
-parser.add_argument("--sc_batch_size", type=int, default=32, help="batch size")  # 32
-parser.add_argument("--tc_batch_size", type=int, default=32, help="batch size")
-parser.add_argument("--po_batch_size", type=int, default=32, help="batch_size")
-parser.add_argument("--pa_batch_size", type=int, default=8, help="batch size")
+parser.add_argument("--sc_batch_size", type=int, default=32, help="batch size")
 
 parser.add_argument("--task_per_queue", type=int, default=8, help="")
 parser.add_argument(
-    "--update_step", type=int, default=3, help="number of REPTILE update steps"
+    "--update_step", type=int, default=3, help="number of Reptile update steps"
 )
 parser.add_argument("--beta", type=float, default=1.0, help="")
 
@@ -84,7 +78,7 @@ parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--log_file", type=str, default="main_output.txt", help="")
 parser.add_argument("--grad_clip", type=float, default=5.0)
-parser.add_argument("--meta_tasks", type=str, default="sc,pa,qa,tc,po")
+parser.add_argument("--meta_tasks", type=str, default="sc")
 parser.add_argument("--queue_length", default=8, type=int)
 
 parser.add_argument(
@@ -202,42 +196,6 @@ def main():
                 local_files_only=args.local_model,
             )
             batch_size = args.sc_batch_size
-        elif "tc" in k:
-            train_corpus = CorpusTC(
-                get_loc("train", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            dev_corpus = CorpusTC(
-                get_loc("dev", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            batch_size = args.tc_batch_size
-        elif "po" in k:
-            train_corpus = CorpusPO(
-                get_loc("train", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            dev_corpus = CorpusPO(
-                get_loc("dev", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            batch_size = args.po_batch_size
-        elif "pa" in k:
-            train_corpus = CorpusPA(
-                get_loc("train", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            dev_corpus = CorpusPA(
-                get_loc("dev", k, args.data_dir)[0],
-                model_name=args.model_name,
-                local_files_only=args.local_model,
-            )
-            batch_size = args.pa_batch_size
         else:
             continue
 

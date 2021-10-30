@@ -42,6 +42,14 @@ class CorpusQA(Dataset):
             )
         }
 
+        self.data = {
+            "input_ids": self.dataset[:][0],
+            "attention_mask": self.dataset[:][1],
+            "token_type_ids": self.dataset[:][2],
+            "answer_start": self.dataset[:][3],
+            "answer_end": self.dataset[:][4],
+        }
+
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
         filename = file[-1]
@@ -156,10 +164,12 @@ class CorpusSC(Dataset):
                 return_tensors="pt",
             )
             input_ids = ids["input_ids"]
-            attention_mask = ids["attention_mask"]
+            attention_mask = ids["attention_mask"].bool()
             token_type_ids = ids["token_type_ids"]
 
-            labels = torch.tensor([self.label_dict[label] for label in label_list])
+            labels = torch.tensor(
+                [self.label_dict[label] for label in label_list], dtype=torch.uint8
+            )
         else:
             with open(path, encoding="utf-8") as f:
                 data = [json.loads(jline) for jline in f.readlines()]

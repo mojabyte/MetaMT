@@ -83,7 +83,7 @@ class BertMetaLearning(nn.Module):
             pooled_output = self.sc_dropout(pooled_output)
             logits = self.sc_classifier(pooled_output)
 
-            loss = F.cross_entropy(logits, data["label"], reduction="none")
+            loss = F.cross_entropy(logits, data["label"].long(), reduction="none")
             outputs = (loss, logits) + outputs[2:]
 
         return outputs

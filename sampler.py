@@ -1,4 +1,3 @@
-import numpy as np
 import random
 from typing import List, Tuple
 
@@ -104,7 +103,7 @@ class TaskSampler(Sampler):
                 ]) with the length of reptile_step
             """
             tensor = tensor.reshape(
-                (self.n_way, self.reptile_step * self.n_shot, *tensor.shape[1:],)
+                (self.n_way, self.reptile_step * self.n_shot, *tensor.shape[1:])
             )
 
             return [

@@ -312,6 +312,7 @@ def main():
             train_loss = 0.0
 
             for miteration_item, queue in enumerate(sampler):
+                print(queue[0]["batch"])
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)
                 train_loss += loss

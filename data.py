@@ -30,19 +30,6 @@ class CorpusQA(Dataset):
         self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
 
         self.data = {
-            key: self.dataset[:][i]
-            for i, key in enumerate(
-                [
-                    "input_ids",
-                    "attention_mask",
-                    "token_type_ids",
-                    "answer_start",
-                    "answer_end",
-                ]
-            )
-        }
-
-        self.data = {
             "input_ids": self.dataset[:][0],
             "attention_mask": self.dataset[:][1].bool(),
             "token_type_ids": self.dataset[:][2].bool(),

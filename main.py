@@ -229,8 +229,6 @@ def main():
     else:
         model = BertMetaLearning(args).to(DEVICE)
 
-    # steps = args.epochs * args.meta_iteration
-
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -254,12 +252,7 @@ def main():
     ]
 
     optim = AdamW(optimizer_grouped_parameters, lr=args.meta_lr, eps=args.adam_epsilon)
-    # scheduler = get_linear_schedule_with_warmup(
-    #     optim,
-    #     num_warmup_steps=args.warmup,
-    #     num_training_steps=steps,
-    #     last_epoch=args.start_epoch - 1,
-    # )
+
     scheduler = StepLR(
         optim,
         step_size=args.step_size,
@@ -267,34 +260,23 @@ def main():
         last_epoch=args.last_step - 1,
     )
 
-    logger = {}
-    logger["total_val_loss"] = []
-    logger["val_loss"] = {k: [] for k in list_of_tasks}
-    logger["train_loss"] = []
-    logger["args"] = args
-
     ## == 2) Learn model
     global_time = time.time()
 
     min_task_losses = {
         "qa": float("inf"),
         "sc": float("inf"),
-        "po": float("inf"),
-        "tc": float("inf"),
-        "pa": float("inf"),
     }
 
     try:
         for epoch_item in range(args.start_epoch, args.epochs):
-            print(
-                "===================================== Epoch %d ====================================="
-                % epoch_item
-            )
+            print(f"======================= Epoch {epoch_item} =======================")
             train_loss = 0.0
 
             train_loader_iterations = [
                 iter(train_loader) for train_loader in train_loaders
             ]
+
             for miteration_item in range(args.meta_iteration):
 
                 # == Data preparation ===========

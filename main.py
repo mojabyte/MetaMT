@@ -80,7 +80,7 @@ parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--log_file", type=str, default="main_output.txt", help="")
 parser.add_argument("--grad_clip", type=float, default=5.0)
 parser.add_argument("--meta_tasks", type=str, default="sc")
-parser.add_argument("--queue_length", default=8, type=int)
+parser.add_argument("--queue_len", default=8, type=int)
 
 parser.add_argument("--num_workers", type=int, default=0, help="")
 parser.add_argument("--pin_memory", action="store_true", help="")
@@ -159,7 +159,7 @@ class Sampler:
         # Sampling Weights
         self.init_p = p
 
-        self.task_per_queue = args.queue_length
+        self.task_per_queue = args.queue_len
         self.list_of_tasks = list_of_tasks
         self.dataloaders = dataloaders
         self.list_of_iters = {k: iter(dataloaders[k]) for k in self.list_of_tasks}
@@ -329,7 +329,7 @@ def main():
             #     iter(train_loader) for train_loader in train_loaders
             # ]
 
-            for miteration_item, metabatch in enumerate(sampler):
+            for miteration_item, queue in enumerate(sampler):
                 # == Data preparation ===========
                 # queue = [
                 #     {"batch": next(train_loader_iterations[i]), "task": task}
@@ -339,8 +339,10 @@ def main():
                 # if args.queue_length < len(train_loader_iterations):
                 #     queue = random.sample(queue, args.queue_length)
 
+                print(queue)
+
                 ## == train ===================
-                loss = reptile_learner(model, metabatch, optim, miteration_item, args)
+                loss = reptile_learner(model, queue, optim, miteration_item, args)
                 train_loss += loss
 
                 ## == validation ==============

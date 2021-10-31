@@ -107,7 +107,10 @@ class TaskSampler(Sampler):
                 (self.n_way, self.reptile_step * self.n_shot, *tensor.shape[1:],)
             )
 
-            return torch.chunk(tensor, self.reptile_step, dim=1)
+            return [
+                item.flatten(end_dim=1)
+                for item in torch.chunk(tensor, self.reptile_step, dim=1)
+            ]
 
         data = {k: chunk_tensor(v) for k, v in input_data.items()}
         data = [{k: v[i] for k, v in data.items()} for i in range(self.reptile_step)]

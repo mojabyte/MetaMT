@@ -333,7 +333,7 @@ def main():
                 # if args.queue_length < len(train_loader_iterations):
                 #     queue = random.sample(queue, args.queue_length)
 
-                print(queue[:]["task"])
+                print(len(queue))
 
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)

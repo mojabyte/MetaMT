@@ -46,7 +46,7 @@ class TaskSampler(Sampler):
 
         self.indices_per_label = {}
 
-        if "label" in dataset.data.keys():
+        if "label" in dataset[0].keys():
             for index, label in enumerate(dataset.data["label"].tolist()):
                 if label in self.indices_per_label.keys():
                     self.indices_per_label[label].append(index)

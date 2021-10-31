@@ -1,4 +1,4 @@
-import argparse, time, torch, os, logging, warnings, sys
+import argparse, gc, time, torch, os, logging, warnings, sys
 import random
 
 import numpy as np
@@ -87,8 +87,7 @@ parser.add_argument(
 parser.add_argument("--temp", type=float, default=1.0)
 
 parser.add_argument("--num_workers", type=int, default=0, help="")
-parser.add_argument("--n_best_size", default=20, type=int)  # 20
-parser.add_argument("--max_answer_length", default=30, type=int)  # 30
+parser.add_argument("--pin_memory", action="store_true", help="")
 parser.add_argument(
     "--weight_decay", default=0.0, type=float, help="Weight decay if we apply some."
 )
@@ -212,19 +211,23 @@ def main():
             train_corpus,
             batch_sampler=train_sampler,
             num_workers=args.num_workers,
-            pin_memory=True,
+            pin_memory=args.pin_memory,
             collate_fn=train_sampler.episodic_collate_fn,
         )
         train_loaders.append(train_loader)
 
-        dev_loader = DataLoader(dev_corpus, batch_size=batch_size, pin_memory=True)
+        dev_loader = DataLoader(
+            dev_corpus, batch_size=batch_size, pin_memory=args.pin_memory
+        )
         dev_loaders.append(dev_loader)
 
-    model = BertMetaLearning(args).to(DEVICE)
+        gc.collect()
 
     if args.load != "":
         print(f"loading model {args.load}...")
         model = torch.load(args.load)
+    else:
+        model = BertMetaLearning(args).to(DEVICE)
 
     # steps = args.epochs * args.meta_iteration
 

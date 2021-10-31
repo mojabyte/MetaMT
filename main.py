@@ -57,11 +57,7 @@ parser.add_argument(
     "--start_epoch", type=int, default=0, help="start iterations from"
 )  # 0
 parser.add_argument("--ways", type=int, default=2, help="number of ways")  # 2
-parser.add_argument(
-    "--query_ways", type=int, default=2, help="number of ways for query"
-)
 parser.add_argument("--shot", type=int, default=4, help="number of shots")  # 4
-parser.add_argument("--query_num", type=int, default=0, help="number of queries")  # 0
 parser.add_argument("--meta_iteration", type=int, default=3000, help="")
 # ---------------
 
@@ -250,9 +246,7 @@ def main():
         train_sampler = TaskSampler(
             train_corpus,
             n_way=args.ways,
-            # n_query_way=args.query_ways,
             n_shot=args.shot,
-            n_query=args.query_num,
             n_tasks=args.meta_iteration,
             reptile_step=args.update_step,
         )
@@ -339,7 +333,7 @@ def main():
                 # if args.queue_length < len(train_loader_iterations):
                 #     queue = random.sample(queue, args.queue_length)
 
-                print(queue)
+                print(queue[:]["task"])
 
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)

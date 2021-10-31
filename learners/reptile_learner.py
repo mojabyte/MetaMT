@@ -19,10 +19,10 @@ def reptile_learner(model, queue, optimizer, iteration, args):
         for i in range(queue_length):
             optimizer.zero_grad()
 
-            support_data = queue[i]["batch"][k]["support"]
+            data = queue[i]["batch"][k]
             task = queue[i]["task"]
 
-            output = model.forward(task, support_data)
+            output = model.forward(task, data)
             loss = output[0].mean()
 
             # loss_cls = criterion(logits, support_labels)

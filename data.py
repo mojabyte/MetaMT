@@ -29,6 +29,12 @@ class CorpusQA(Dataset):
 
         self.data, self.examples, self.features = self.preprocess(path, evaluate)
 
+        print("len(self.examples):", len(self.examples))
+        print("self.examples[0]", self.examples[0])
+
+        print("len(self.features):", len(self.features))
+        print("self.features[0]", self.features[0])
+
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
         filename = file[-1]

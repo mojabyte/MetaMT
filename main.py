@@ -48,6 +48,7 @@ parser.add_argument("--task_per_queue", type=int, default=8, help="")
 parser.add_argument(
     "--update_step", type=int, default=3, help="number of Reptile update steps"
 )
+parser.add_argument("--temp", type=float, default=1.0)
 parser.add_argument("--beta", type=float, default=1.0, help="")
 
 # ---------------
@@ -142,11 +143,65 @@ def evaluateMeta(model, dev_loaders):
     loss_dict = {}
     total_loss = 0
     model.eval()
-    for i, task in enumerate(list_of_tasks):
-        loss = evaluate(model, task, dev_loaders[i])
+    for task in list_of_tasks:
+        loss = evaluate(model, task, dev_loaders[task])
         loss_dict[task] = loss
         total_loss += loss
     return loss_dict, total_loss
+
+
+def get_batch(dataloader_iter, dataloader):
+    try:
+        batch = next(dataloader_iter)
+    except StopIteration:
+        dataloader_iter = iter(dataloader)
+        batch = next(dataloader_iter)
+    return batch
+
+
+class Sampler:
+    def __init__(self, p, dataloaders):
+        # Sampling Weights
+        self.init_p = p
+
+        self.task_per_queue = args.queue_length
+        self.list_of_tasks = list_of_tasks
+        self.dataloaders = dataloaders
+        self.list_of_iters = {k: iter(dataloaders[k]) for k in self.list_of_tasks}
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        curr_p = self.init_p
+
+        tasks = np.random.choice(self.list_of_tasks, self.task_per_queue, p=curr_p)
+        queue = [
+            {
+                "task": tasks[i],
+                "batch": get_batch(
+                    self.list_of_iters[tasks[i]], self.dataloaders[tasks[i]]
+                ),
+            }
+            for i in range(self.task_per_queue)
+        ]
+        return queue
+
+
+def UniformBatchSampler(dataloaders):
+    p = np.array(
+        [
+            len(dataloaders[y])
+            * 1.0
+            / sum([len(dataloaders[x]) for x in list_of_tasks])
+            for y in list_of_tasks
+        ]
+    )
+    p_temp = np.power(p, 1.0 / args.temp)
+    p_temp = p_temp / np.sum(p_temp)
+    print(p_temp)
+    sampler = iter(Sampler(p_temp, dataloaders))
+    return sampler
 
 
 def main():
@@ -163,8 +218,8 @@ def main():
     DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
     # loader
-    train_loaders = []
-    dev_loaders = []
+    train_loaders = {}
+    dev_loaders = {}
 
     for k in list_of_tasks:
         train_corpus = None
@@ -214,12 +269,12 @@ def main():
             pin_memory=args.pin_memory,
             collate_fn=train_sampler.episodic_collate_fn,
         )
-        train_loaders.append(train_loader)
+        train_loaders[k] = train_loader
 
         dev_loader = DataLoader(
             dev_corpus, batch_size=batch_size, pin_memory=args.pin_memory
         )
-        dev_loaders.append(dev_loader)
+        dev_loaders[k] = dev_loader
 
         gc.collect()
 
@@ -268,28 +323,29 @@ def main():
         "sc": float("inf"),
     }
 
+    sampler = UniformBatchSampler(train_loaders)
+
     try:
         for epoch_item in range(args.start_epoch, args.epochs):
             print(f"======================= Epoch {epoch_item} =======================")
             train_loss = 0.0
 
-            train_loader_iterations = [
-                iter(train_loader) for train_loader in train_loaders
-            ]
+            # train_loader_iterations = [
+            #     iter(train_loader) for train_loader in train_loaders
+            # ]
 
-            for miteration_item in range(args.meta_iteration):
-
+            for miteration_item, metabatch in enumerate(sampler):
                 # == Data preparation ===========
-                queue = [
-                    {"batch": next(train_loader_iterations[i]), "task": task}
-                    for i, task in enumerate(list_of_tasks)
-                ]
+                # queue = [
+                #     {"batch": next(train_loader_iterations[i]), "task": task}
+                #     for i, task in enumerate(list_of_tasks)
+                # ]
 
-                if args.queue_length < len(train_loader_iterations):
-                    queue = random.sample(queue, args.queue_length)
+                # if args.queue_length < len(train_loader_iterations):
+                #     queue = random.sample(queue, args.queue_length)
 
                 ## == train ===================
-                loss = reptile_learner(model, queue, optim, miteration_item, args)
+                loss = reptile_learner(model, metabatch, optim, miteration_item, args)
                 train_loss += loss
 
                 ## == validation ==============

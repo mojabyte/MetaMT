@@ -77,8 +77,8 @@ class CorpusQA(Dataset):
     def __getitem__(self, id):
         return {
             "input_ids": self.data[id][0],
-            "attention_mask": self.data[id][1],
-            "token_type_ids": self.data[id][2],
+            "attention_mask": self.data[id][1].bool(),
+            "token_type_ids": self.data[id][2].bool(),
             "answer_start": self.data[id][3],
             "answer_end": self.data[id][4],
         }

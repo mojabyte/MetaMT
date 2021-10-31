@@ -8,9 +8,6 @@ from data import CorpusQA, CorpusSC
 from model import BertMetaLearning
 from datapath import loc, get_loc
 
-# import torch_xla
-# import torch_xla.core.xla_model as xm
-
 from sampler import TaskSampler
 from learners.reptile_learner import reptile_learner
 from utils.logger import Logger
@@ -70,7 +67,6 @@ parser.add_argument(
 )
 parser.add_argument("--data_dir", type=str, default="data/", help="directory of data")
 parser.add_argument("--cuda", action="store_true", help="use CUDA")
-parser.add_argument("--tpu", action="store_true", help="use TPU")
 parser.add_argument("--save", type=str, default="saved/", help="")
 parser.add_argument("--load", type=str, default="", help="")
 parser.add_argument("--log_file", type=str, default="main_output.txt", help="")
@@ -200,10 +196,6 @@ def main():
 
         torch.cuda.manual_seed_all(args.seed)
 
-    # DEVICE = (
-    #     xm.xla_device() if args.tpu else torch.device("cuda" if args.cuda else "cpu")
-    # )
-
     DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
     # loader
@@ -319,22 +311,7 @@ def main():
             print(f"======================= Epoch {epoch_item} =======================")
             train_loss = 0.0
 
-            # train_loader_iterations = [
-            #     iter(train_loader) for train_loader in train_loaders
-            # ]
-
             for miteration_item, queue in enumerate(sampler):
-                # == Data preparation ===========
-                # queue = [
-                #     {"batch": next(train_loader_iterations[i]), "task": task}
-                #     for i, task in enumerate(list_of_tasks)
-                # ]
-
-                # if args.queue_length < len(train_loader_iterations):
-                #     queue = random.sample(queue, args.queue_length)
-
-                print(len(queue))
-
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)
                 train_loss += loss

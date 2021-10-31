@@ -82,11 +82,6 @@ parser.add_argument("--grad_clip", type=float, default=5.0)
 parser.add_argument("--meta_tasks", type=str, default="sc")
 parser.add_argument("--queue_length", default=8, type=int)
 
-parser.add_argument(
-    "--sampler", type=str, default="uniform_batch", choices=["uniform_batch"]
-)
-parser.add_argument("--temp", type=float, default=1.0)
-
 parser.add_argument("--num_workers", type=int, default=0, help="")
 parser.add_argument("--pin_memory", action="store_true", help="")
 parser.add_argument(

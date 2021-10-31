@@ -34,7 +34,7 @@ def to_list(tensor):
 
 
 def evaluateQA(model, corpus, task, path):
-    dataset, examples, features = corpus.dataset, corpus.examples, corpus.features
+    dataset, examples, features = corpus.data, corpus.examples, corpus.features
     tokenizer = corpus.tokenizer
     # Note that DistributedSampler samples randomly
     eval_sampler = SequentialSampler(dataset)

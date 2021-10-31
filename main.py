@@ -183,12 +183,10 @@ class Sampler:
         return queue
 
 
-def UniformBatchSampler(dataloaders):
+def UniformBatchSampler(dataloaders, corpus_len):
     p = np.array(
         [
-            len(dataloaders[y])
-            * 1.0
-            / sum([len(dataloaders[x]) for x in list_of_tasks])
+            corpus_len[y] * 1.0 / sum([corpus_len[x] for x in list_of_tasks])
             for y in list_of_tasks
         ]
     )
@@ -215,6 +213,7 @@ def main():
     # loader
     train_loaders = {}
     dev_loaders = {}
+    corpus_len = {}
 
     for k in list_of_tasks:
         train_corpus = None
@@ -265,6 +264,7 @@ def main():
             collate_fn=train_sampler.episodic_collate_fn,
         )
         train_loaders[k] = train_loader
+        corpus_len[k] = len(train_corpus)
 
         dev_loader = DataLoader(
             dev_corpus, batch_size=batch_size, pin_memory=args.pin_memory
@@ -318,7 +318,7 @@ def main():
         "sc": float("inf"),
     }
 
-    sampler = UniformBatchSampler(train_loaders)
+    sampler = UniformBatchSampler(train_loaders, corpus_len)
 
     try:
         for epoch_item in range(args.start_epoch, args.epochs):
@@ -351,10 +351,6 @@ def main():
 
                     # evalute on val_dataset
                     val_loss_dict, val_loss_total = evaluateMeta(model, dev_loaders)
-                    # val_loss_total = reptile_evaluate(model, dev_loader, criterion, DEVICE) # For Reptile
-                    # val_loss_total = pt_evaluate(
-                    #     model, val_dataloader, prototypes, criterion, device
-                    # )  # For Pt.
 
                     loss_per_task = {}
                     for task in val_loss_dict.keys():

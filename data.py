@@ -27,15 +27,7 @@ class CorpusQA(Dataset):
             local_files_only=local_files_only,
         )
 
-        self.dataset, self.examples, self.features = self.preprocess(path, evaluate)
-
-        self.data = {
-            "input_ids": self.dataset[:][0],
-            "attention_mask": self.dataset[:][1].bool(),
-            "token_type_ids": self.dataset[:][2].bool(),
-            "answer_start": self.dataset[:][3],
-            "answer_end": self.dataset[:][4],
-        }
+        self.data, self.examples, self.features = self.preprocess(path, evaluate)
 
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
@@ -80,15 +72,15 @@ class CorpusQA(Dataset):
         return dataset, examples, features
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.data)
 
     def __getitem__(self, id):
         return {
-            "input_ids": self.dataset[id][0],
-            "attention_mask": self.dataset[id][1],
-            "token_type_ids": self.dataset[id][2],
-            "answer_start": self.dataset[id][3],
-            "answer_end": self.dataset[id][4],
+            "input_ids": self.data[id][0],
+            "attention_mask": self.data[id][1],
+            "token_type_ids": self.data[id][2],
+            "answer_start": self.data[id][3],
+            "answer_end": self.data[id][4],
         }
 
 

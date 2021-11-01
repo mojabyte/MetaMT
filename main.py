@@ -120,7 +120,7 @@ def evaluate(model, task, data):
         total_loss = 0.0
         for batch in data:
             output = model.forward(task, batch)
-            loss = output[0].mean()
+            loss = output[0].detach().mean()
             total_loss += loss.item()
         total_loss /= len(data)
         return total_loss
@@ -311,23 +311,13 @@ def main():
             print(f"======================= Epoch {epoch_item} =======================")
             train_loss = 0.0
 
-            tim = time.time()
-
             for miteration_item, queue in enumerate(sampler):
                 if miteration_item >= args.meta_iteration:
                     break
 
-                print("start train:", time.time() - tim)
-                tim = time.time()
-
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)
-                print("reptile:", time.time() - tim)
-                tim = time.time()
-
                 train_loss += loss
-                print("accumulate loss:", time.time() - tim)
-                tim = time.time()
 
                 ## == validation ==============
                 if (miteration_item + 1) % args.log_interval == 0:

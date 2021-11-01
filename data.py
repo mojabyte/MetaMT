@@ -29,12 +29,6 @@ class CorpusQA(Dataset):
 
         self.data, self.examples, self.features = self.preprocess(path, evaluate)
 
-        print("len(self.examples):", len(self.examples))
-        print("self.examples[0]", self.examples[0])
-
-        print("len(self.features):", len(self.features))
-        print("self.features[0]", self.features[0])
-
     def preprocess(self, file, evaluate=False):
         file = file.split("/")
         filename = file[-1]
@@ -70,6 +64,9 @@ class CorpusQA(Dataset):
                 threads=1,
             )
 
+            dataset[:][1] = dataset[:][1].bool()
+            dataset[:][2] = dataset[:][2].bool()
+
             torch.save(
                 {"features": features, "dataset": dataset, "examples": examples},
                 cached_features_file,
@@ -83,8 +80,8 @@ class CorpusQA(Dataset):
     def __getitem__(self, id):
         return {
             "input_ids": self.data[id][0],
-            "attention_mask": self.data[id][1].bool(),
-            "token_type_ids": self.data[id][2].bool(),
+            "attention_mask": self.data[id][1],
+            "token_type_ids": self.data[id][2],
             "answer_start": self.data[id][3],
             "answer_end": self.data[id][4],
         }

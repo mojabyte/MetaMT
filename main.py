@@ -361,8 +361,6 @@ def main():
                 if args.scheduler:
                     scheduler.step()
 
-                print("the end:", time.time() - tim)
-
     except KeyboardInterrupt:
         print("skipping training")
 

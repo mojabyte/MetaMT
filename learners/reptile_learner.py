@@ -1,15 +1,10 @@
 import torch
-import time
 
 
 def reptile_learner(model, queue, optimizer, iteration, args):
     model.train()
-    main_time = time.time()
 
     old_vars = [param.data.clone() for param in model.parameters()]
-
-    print("declare old_vars:", time.time() - main_time)
-    main_time = time.time()
 
     queue_length = len(queue)
     losses = 0
@@ -27,21 +22,15 @@ def reptile_learner(model, queue, optimizer, iteration, args):
             loss = output[0].mean()
             loss.backward()
 
-            losses += loss.item()
+            losses += loss.detach().item()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
 
             optimizer.step()
 
-    print("train loop:", time.time() - main_time)
-    main_time = time.time()
-
     beta = args.beta * (1 - iteration / args.meta_iteration)
     for idx, param in enumerate(model.parameters()):
         param.data = (1 - beta) * old_vars[idx].data + beta * param.data
-
-    print("update params:", time.time() - main_time)
-    main_time = time.time()
 
     return losses / (queue_length * args.update_step)
 

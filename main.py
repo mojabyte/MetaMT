@@ -311,13 +311,23 @@ def main():
             print(f"======================= Epoch {epoch_item} =======================")
             train_loss = 0.0
 
+            tim = time.time()
+
             for miteration_item, queue in enumerate(sampler):
                 if miteration_item >= args.meta_iteration:
                     break
 
+                print("start train:", time.time() - tim)
+                tim = time.time()
+
                 ## == train ===================
                 loss = reptile_learner(model, queue, optim, miteration_item, args)
+                print("reptile:", time.time() - tim)
+                tim = time.time()
+
                 train_loss += loss
+                print("accumulate loss:", time.time() - tim)
+                tim = time.time()
 
                 ## == validation ==============
                 if (miteration_item + 1) % args.log_interval == 0:
@@ -360,6 +370,8 @@ def main():
 
                 if args.scheduler:
                     scheduler.step()
+
+                print("the end:", time.time() - tim)
 
     except KeyboardInterrupt:
         print("skipping training")

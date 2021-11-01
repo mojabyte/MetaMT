@@ -64,8 +64,17 @@ class CorpusQA(Dataset):
                 threads=1,
             )
 
-            dataset[:][1] = [item.bool() for item in dataset[:][1]]
-            dataset[:][2] = [item.bool() for item in dataset[:][2]]
+            print(dataset[0])
+
+            dataset = {
+                "input_ids": dataset[:][0],
+                "attention_mask": dataset[:][1],
+                "token_type_ids": dataset[:][2],
+                "answer_start": dataset[:][3],
+                "answer_end": dataset[:][4],
+            }
+
+            print(dataset)
 
             torch.save(
                 {"features": features, "dataset": dataset, "examples": examples},

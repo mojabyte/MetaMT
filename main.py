@@ -339,7 +339,7 @@ def main():
 
                     for task in loss_per_task.keys():
                         if loss_per_task[task] < min_task_losses[task]:
-                            print("Saving " + task + "  Model")
+                            print("Saving " + task + " Model")
                             torch.save(
                                 model, os.path.join(args.save, "model_" + task + ".pt"),
                             )

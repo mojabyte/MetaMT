@@ -34,7 +34,7 @@ class BertMetaLearning(nn.Module):
             outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
-                token_type_ids=data["token_type_ids"].long(),
+                token_type_ids=data["token_type_ids"],
             )
 
             sequence_output = outputs[0]
@@ -75,7 +75,7 @@ class BertMetaLearning(nn.Module):
             outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
-                token_type_ids=data["token_type_ids"].long(),
+                token_type_ids=data["token_type_ids"],
             )
 
             pooled_output = outputs[1]
@@ -83,7 +83,7 @@ class BertMetaLearning(nn.Module):
             pooled_output = self.sc_dropout(pooled_output)
             logits = self.sc_classifier(pooled_output)
 
-            loss = F.cross_entropy(logits, data["label"].long(), reduction="none")
+            loss = F.cross_entropy(logits, data["label"], reduction="none")
             outputs = (loss, logits) + outputs[2:]
 
         return outputs

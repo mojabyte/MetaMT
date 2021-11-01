@@ -1,57 +1,42 @@
 import torch
-
-# import torch_xla
-# import torch_xla.core.xla_model as xm
+import time
 
 
 def reptile_learner(model, queue, optimizer, iteration, args):
     model.train()
 
     old_vars = [param.data.clone() for param in model.parameters()]
-    # running_vars = [
-    #     torch.zeros(param.shape, device=device) for param in model.parameters()
-    # ]
 
     queue_length = len(queue)
     losses = 0
 
     for k in range(args.update_step):
         for i in range(queue_length):
+            main_time = time.time()
             optimizer.zero_grad()
 
             data = queue[i]["batch"][k]
             task = queue[i]["task"]
 
             output = model.forward(task, data)
-            loss = output[0].mean()
 
-            # loss_cls = criterion(logits, support_labels)
-            # loss_cls = loss_cls.mean()
-            # loss = loss_cls
+            print("forward:", time.time() - main_time)
+            main_time = time.time()
+
+            loss = output[0].mean()
+            print("mean loss:", time.time() - main_time)
+            main_time = time.time()
 
             loss.backward()
+            print("backward:", time.time() - main_time)
+            main_time = time.time()
+
             losses += loss.item()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.grad_clip)
 
-            # if args.tpu:
-            #     # Optimizer for TPU
-            #     xm.optimizer_step(optimizer, barrier=True)
-            # else:
-            #     # Optimizer for GPU
-            #     optimizer.step()
             optimizer.step()
-
-        # for idx, param in enumerate(model.parameters()):
-        #     running_vars[idx].data += param.data.clone()
-        #     param.data = old_vars[idx].data.clone()
-
-    # for param in running_vars:
-    #     param.data /= queue_length
-
-    # for idx, param in enumerate(model.parameters()):
-    #     param.data += args.beta * running_vars[idx].data
-    #     param.data -= args.beta * old_vars[idx].data
+            print("finalize:", time.time() - main_time)
 
     beta = args.beta * (1 - iteration / args.meta_iteration)
     for idx, param in enumerate(model.parameters()):

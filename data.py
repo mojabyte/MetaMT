@@ -64,8 +64,8 @@ class CorpusQA(Dataset):
                 threads=1,
             )
 
-            dataset[:][1] = dataset[:][1].bool()
-            dataset[:][2] = dataset[:][2].bool()
+            dataset[:][1] = [item.bool() for item in dataset[:][1]]
+            dataset[:][2] = [item.bool() for item in dataset[:][2]]
 
             torch.save(
                 {"features": features, "dataset": dataset, "examples": examples},

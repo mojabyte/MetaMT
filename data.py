@@ -142,8 +142,8 @@ class CorpusSC(Dataset):
                 return_tensors="pt",
             )
             input_ids = ids["input_ids"]
-            attention_mask = ids["attention_mask"].bool()
-            token_type_ids = ids["token_type_ids"].bool()
+            attention_mask = ids["attention_mask"]
+            token_type_ids = ids["token_type_ids"]
 
             labels = torch.tensor([self.label_dict[label] for label in label_list])
 

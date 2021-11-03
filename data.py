@@ -143,7 +143,7 @@ class CorpusSC(Dataset):
             )
             input_ids = ids["input_ids"]
             attention_mask = ids["attention_mask"].bool()
-            token_type_ids = ids["token_type_ids"]
+            token_type_ids = ids["token_type_ids"].bool()
 
             labels = torch.tensor([self.label_dict[label] for label in label_list])
 
@@ -155,47 +155,6 @@ class CorpusSC(Dataset):
         }
 
         return dataset
-
-    def encode(self, sentence1, sentence2):
-
-        tokens = []
-        segment_mask = []
-        input_mask = []
-
-        tokens.append(self.cls_token)
-        segment_mask.append(self.cls_token_segment_id)
-        input_mask.append(1 if self.mask_padding_with_zero else 0)
-
-        for tok in sentence1:
-            tokens.append(tok)
-            segment_mask.append(self.sequence_a_segment_id)
-            input_mask.append(1 if self.mask_padding_with_zero else 0)
-
-        tokens.append(self.sep_token)
-        segment_mask.append(self.sequence_a_segment_id)
-        input_mask.append(1 if self.mask_padding_with_zero else 0)
-
-        for tok in sentence2:
-            tokens.append(tok)
-            segment_mask.append(self.sequence_b_segment_id)
-            input_mask.append(1 if self.mask_padding_with_zero else 0)
-
-        tokens.append(self.sep_token)
-        segment_mask.append(self.sequence_b_segment_id)
-        input_mask.append(1 if self.mask_padding_with_zero else 0)
-
-        tokens = self.tokenizer.convert_tokens_to_ids(tokens)
-
-        while len(tokens) < self.max_sequence_length:
-            tokens.append(self.pad_token)
-            segment_mask.append(self.pad_token_segment_id)
-            input_mask.append(0 if self.mask_padding_with_zero else 1)
-
-        tokens = torch.tensor(tokens)
-        segment_mask = torch.tensor(segment_mask)
-        input_mask = torch.tensor(input_mask)
-
-        return tokens, segment_mask, input_mask
 
     def __len__(self):
         return self.data["input_ids"].shape[0]

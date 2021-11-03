@@ -262,9 +262,7 @@ def main():
 
         gc.collect()
 
-        print(
-            f"preparing {k} dataloaders completed in {time.time() - time_dataloader:.2f}s!"
-        )
+        print(f"Completed in {time.time() - time_dataloader:.2f}s.")
 
     if args.load != "":
         print(f"loading model {args.load}...")

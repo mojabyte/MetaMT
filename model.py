@@ -34,7 +34,7 @@ class BertMetaLearning(nn.Module):
             outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
-                token_type_ids=data["token_type_ids"],
+                token_type_ids=data["token_type_ids"].long(),
             )
 
             sequence_output = outputs[0]
@@ -75,7 +75,7 @@ class BertMetaLearning(nn.Module):
             outputs = self.model(
                 data["input_ids"],
                 attention_mask=data["attention_mask"],
-                token_type_ids=data["token_type_ids"],
+                token_type_ids=data["token_type_ids"].long(),
             )
 
             pooled_output = outputs[1]

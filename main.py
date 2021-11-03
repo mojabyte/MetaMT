@@ -198,12 +198,6 @@ def main():
 
     DEVICE = torch.device("cuda" if args.cuda else "cpu")
 
-    if args.load != "":
-        print(f"loading model {args.load}...")
-        model = torch.load(args.load)
-    else:
-        model = BertMetaLearning(args).to(DEVICE)
-
     # loader
     train_loaders = {}
     dev_loaders = {}
@@ -269,6 +263,12 @@ def main():
         gc.collect()
 
         print(f"Completed in {time.time() - time_dataloader:.2f}s.")
+
+    if args.load != "":
+        print(f"loading model {args.load}...")
+        model = torch.load(args.load)
+    else:
+        model = BertMetaLearning(args).to(DEVICE)
 
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [

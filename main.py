@@ -204,6 +204,9 @@ def main():
     corpus_len = {}
 
     for k in list_of_tasks:
+        time_dataloader = time.time()
+        print(f"preparing {k} dataloaders...")
+
         train_corpus = None
         dev_corpus = None
         batch_size = 32
@@ -258,6 +261,10 @@ def main():
         dev_loaders[k] = dev_loader
 
         gc.collect()
+
+        print(
+            f"preparing {k} dataloaders completed in {time.time() - time_dataloader:.2f}s!"
+        )
 
     if args.load != "":
         print(f"loading model {args.load}...")

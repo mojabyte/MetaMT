@@ -1,8 +1,7 @@
 import torch
 from transformers import AutoTokenizer
 from transformers.data.processors.squad import *
-from tqdm import tqdm
-import json, os
+import os
 import pandas as pd
 
 import pickle5 as pickle
@@ -147,35 +146,6 @@ class CorpusSC(Dataset):
             token_type_ids = ids["token_type_ids"]
 
             labels = torch.tensor([self.label_dict[label] for label in label_list])
-        else:
-            with open(path, encoding="utf-8") as f:
-                data = [json.loads(jline) for jline in f.readlines()]
-                for row in tqdm(data):
-                    label = row["gold_label"]
-
-                    if label not in ["neutral", "contradiction", "entailment"]:
-                        continue
-
-                    sentence1_tokenized = self.tokenizer.tokenize(row["sentence1"])
-                    sentence2_tokenized = self.tokenizer.tokenize(row["sentence2"])
-                    if (
-                        len(sentence1_tokenized) + len(sentence2_tokenized) + 3
-                        > self.max_sequence_length
-                    ):
-                        continue
-
-                    input_ids, token_type_ids, attention_mask = self.encode(
-                        sentence1_tokenized, sentence2_tokenized
-                    )
-                    labels.append(self.label_dict[label])
-                    input_ids.append(torch.unsqueeze(input_ids, dim=0))
-                    token_type_ids.append(torch.unsqueeze(token_type_ids, dim=0))
-                    attention_mask.append(torch.unsqueeze(attention_mask, dim=0))
-
-            labels = torch.tensor(labels)
-            input_ids = torch.cat(input_ids, dim=0)
-            token_type_ids = torch.cat(token_type_ids, dim=0)
-            attention_mask = torch.cat(attention_mask, dim=0)
 
         dataset = {
             "input_ids": input_ids,
